@@ -13,17 +13,16 @@ class GeofenceWorker(appContext: Context, workerParams : WorkerParameters) :
 
     override suspend fun doWork(): Result {
         runCatching {
-            Log.d("GeofenceWorker","Start")
             when(prefUtil.getUserMode()){
                 //pedestrian
                 true -> Intent(applicationContext, PedestrianService::class.java).apply {
                     action = PedestrianService.ACTION_START
-                    applicationContext.startService(this)
+                    applicationContext.startForegroundService(this)
                 }
                 //vehicle
                 false -> Intent(applicationContext, VehicleService::class.java).apply {
                     action = PedestrianService.ACTION_START
-                    applicationContext.startService(this)
+                    applicationContext.startForegroundService(this)
                 }
             }
         }

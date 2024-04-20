@@ -7,10 +7,12 @@ import android.location.LocationManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
+@Deprecated
 public class SensorBasedMotionProvider : MovementAnalyzer, SensorEventListener{
 
     private lateinit var sensorManager: SensorManager
@@ -29,7 +31,6 @@ public class SensorBasedMotionProvider : MovementAnalyzer, SensorEventListener{
     override fun getMovementUpdates(): Flow<Location> {
         return callbackFlow {
             val sensorCallback =
-                @RequiresApi(Build.VERSION_CODES.N)
                 object : SensorEventCallback() {
                     override fun onSensorChanged(event: SensorEvent) {
                         super.onSensorChanged(event)
@@ -39,7 +40,11 @@ public class SensorBasedMotionProvider : MovementAnalyzer, SensorEventListener{
                         launch { send(location) }
                     }
                 }
+            awaitClose {
+                sensorManager.unregisterListener(this@SensorBasedMotionProvider)
+            }
         }
+
     }
 
     override fun initServiceManager(context: Context) {
