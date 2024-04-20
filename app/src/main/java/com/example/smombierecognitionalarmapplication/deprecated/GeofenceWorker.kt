@@ -1,10 +1,11 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.deprecated
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.smombierecognitionalarmapplication.PedestrianService
+import com.example.smombierecognitionalarmapplication.VehicleService
 import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
 
 class GeofenceWorker(appContext: Context, workerParams : WorkerParameters) :

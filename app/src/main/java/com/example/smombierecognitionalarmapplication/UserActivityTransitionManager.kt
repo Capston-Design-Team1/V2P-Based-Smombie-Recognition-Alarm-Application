@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.RequiresPermission
-import com.example.smombierecognitionalarmapplication.utils.CUSTOM_INTENT_USER_ACTION
 import com.example.smombierecognitionalarmapplication.utils.CUSTOM_REQUEST_CODE_USER_ACTION
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityTransition
@@ -74,7 +73,7 @@ class UserActivityTransitionManager(context: Context) {
         PendingIntent.getBroadcast(
             context,
             CUSTOM_REQUEST_CODE_USER_ACTION,
-            Intent(CUSTOM_INTENT_USER_ACTION),
+            Intent(context, UserActivityTransitionBroadcastReceiver::class.java),
             PendingIntent.FLAG_IMMUTABLE
         )
     }

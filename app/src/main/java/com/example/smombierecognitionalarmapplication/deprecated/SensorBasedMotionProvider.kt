@@ -1,18 +1,15 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.deprecated
 
 import android.content.Context
 import android.hardware.*
 import android.location.Location
-import android.location.LocationManager
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
+import com.example.smombierecognitionalarmapplication.MovementAnalyzer
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
-@Deprecated
 public class SensorBasedMotionProvider : MovementAnalyzer, SensorEventListener{
 
     private lateinit var sensorManager: SensorManager
@@ -62,7 +59,7 @@ public class SensorBasedMotionProvider : MovementAnalyzer, SensorEventListener{
         }
     }
 
-    override fun unregisterServiceListener() {
+    fun unregisterServiceListener() {
         sensorManager.unregisterListener(this@SensorBasedMotionProvider)
     }
 

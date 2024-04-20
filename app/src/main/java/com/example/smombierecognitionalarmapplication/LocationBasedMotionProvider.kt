@@ -22,7 +22,6 @@ class LocationBasedMotionProvider() : MovementAnalyzer{
     private lateinit var fusedlocationManager : FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
 
-
     @SuppressLint("MissingPermission")
     override fun getMovementUpdates() : Flow<Location> {
         return callbackFlow {
@@ -62,11 +61,6 @@ class LocationBasedMotionProvider() : MovementAnalyzer{
     }
 
     override fun registerServiceListener() {
-        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000).build()
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 6000L).build()
     }
-
-    override fun unregisterServiceListener() {
-        TODO("Not yet implemented")
-    }
-
 }

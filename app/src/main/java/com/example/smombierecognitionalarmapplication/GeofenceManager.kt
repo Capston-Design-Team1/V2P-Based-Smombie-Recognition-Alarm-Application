@@ -7,20 +7,19 @@ import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.util.Log
-import com.example.smombierecognitionalarmapplication.utils.CUSTOM_INTENT_GEOFENCE
 import com.example.smombierecognitionalarmapplication.utils.CUSTOM_REQUEST_CODE_GEOFENCE
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT
+import com.google.android.gms.location.Geofence.NEVER_EXPIRE
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.tasks.await
 
 class GeofenceManager(context: Context) {
     companion object {
-        const val RADIUS_METERS : Float = 100.0f // Default 100m
-        const val EXPIRATION_TIME_MILLIS : Long = 30 * 60 * 1000
+        const val RADIUS_METERS : Float = 500.0f // Default 100m
         const val DWELLING_DELAY_MILLIS : Int = 5000 // 5sec
     }
     private val geofencingClient = LocationServices.getGeofencingClient(context)
@@ -30,7 +29,7 @@ class GeofenceManager(context: Context) {
         PendingIntent.getBroadcast(
             context,
             CUSTOM_REQUEST_CODE_GEOFENCE,
-            Intent(CUSTOM_INTENT_GEOFENCE),
+            Intent(context, GeofenceBroadcastReceiver::class.java),
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 PendingIntent.FLAG_CANCEL_CURRENT
             } else {
@@ -44,7 +43,6 @@ class GeofenceManager(context: Context) {
         location : Location
     ){
         geofenceList[key] = createGeofence(key, location)
-        Log.d("GeofenceManager", "addsucceed")
     }
 
     fun removeGeofence(key: String) {
@@ -52,12 +50,12 @@ class GeofenceManager(context: Context) {
     }
 
     @SuppressLint("MissingPermission")
-    fun registerGeofence() {
+    suspend fun registerGeofence() {
         geofencingClient.addGeofences(getGeofencingRequest(), geofencingPendingIntent)
             .addOnSuccessListener {
                 Log.d("GeofenceManager", "registerGeofence: SUCCESS")
             }.addOnFailureListener { exception ->
-                Log.d("GeofenceManager", "registerGeofence: Failure\n$exception")
+                Log.d("GeofenceManager", "registerGeofence: FAILURE\n$exception")
             }
     }
 
@@ -80,7 +78,7 @@ class GeofenceManager(context: Context) {
         return Geofence.Builder()
             .setRequestId(key)
             .setCircularRegion(location.latitude, location.longitude, RADIUS_METERS)
-            .setExpirationDuration(EXPIRATION_TIME_MILLIS)
+            .setExpirationDuration(NEVER_EXPIRE)
             .setTransitionTypes(GEOFENCE_TRANSITION_ENTER or GEOFENCE_TRANSITION_DWELL or GEOFENCE_TRANSITION_EXIT)
             .setLoiteringDelay(DWELLING_DELAY_MILLIS)
             .build()

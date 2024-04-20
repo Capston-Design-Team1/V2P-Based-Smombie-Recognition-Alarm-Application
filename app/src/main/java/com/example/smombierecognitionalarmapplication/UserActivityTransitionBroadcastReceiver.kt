@@ -19,4 +19,18 @@ class UserActivityTransitionBroadcastReceiver : BroadcastReceiver() {
         }
         Log.d("UserActivityReceiver", "onReceive: $resultStr")
     }
+
+    private fun startPedestrianService(context: Context){
+        Intent(context, PedestrianService::class.java).apply {
+            action = PedestrianService.ACTION_START
+            context.startService(this)
+        }
+    }
+
+    private fun stopPedestrianService(context: Context){
+        Intent(context, PedestrianService::class.java).apply {
+            action = PedestrianService.ACTION_STOP
+            context.startService(this)
+        }
+    }
 }
