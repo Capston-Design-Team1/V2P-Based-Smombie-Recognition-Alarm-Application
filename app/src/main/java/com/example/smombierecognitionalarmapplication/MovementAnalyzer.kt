@@ -5,9 +5,8 @@ import android.location.Location
 import kotlinx.coroutines.flow.Flow
 
 interface MovementAnalyzer {
-    public fun getMovementUpdates() : Flow<Location>
-    public fun initServiceManager(context : Context)
-    public fun registerServiceListener()
-    public fun unregisterServiceListener()
+    fun getMovementUpdates() : Flow<Location>
+    fun initServiceManager(context : Context)
+    fun registerServiceListener()
     class Exceptions(message: String) : Exception()
 }

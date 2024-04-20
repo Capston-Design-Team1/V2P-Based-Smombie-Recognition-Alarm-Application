@@ -1,6 +1,10 @@
 package com.example.smombierecognitionalarmapplication
 
-data class Smombie(
+import com.google.gson.annotations.SerializedName
+
+data class SmombiesDTO(
+    @SerializedName("riskLevel")
     val riskLevel: Int,
-    val smombieLocationList : List<Location>
+    @SerializedName("smombieLocation")
+    val smombieLocationListDTO : List<LocationDTO>
 )

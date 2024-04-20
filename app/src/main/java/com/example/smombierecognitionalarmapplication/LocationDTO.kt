@@ -1,6 +1,10 @@
 package com.example.smombierecognitionalarmapplication
 
-data class Location(
+import com.google.gson.annotations.SerializedName
+
+data class LocationDTO(
+    @SerializedName("latitude")
     val latitude : Double,
+    @SerializedName("longitude")
     val longitude : Double
 )
