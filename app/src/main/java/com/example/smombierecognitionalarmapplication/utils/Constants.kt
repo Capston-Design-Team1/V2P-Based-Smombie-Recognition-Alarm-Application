@@ -16,4 +16,5 @@ const val LOCATION_NOTIFICATION_CHANNEL_ID = "location"
 const val SMOMBIEALERT_NOTIFICATION_ID = 2
 const val SMOMBIEALERT_NOTIFICATION_CHANNEL_ID = "smombieAlert"
 
-const val APIBASE_URL = "http://localhost:8080/"
+//현재 컴퓨터의 IP 주소
+const val APIBASE_URL = "http://192.168.0.14:8080/"

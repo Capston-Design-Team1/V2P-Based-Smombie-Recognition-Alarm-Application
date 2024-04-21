@@ -86,7 +86,7 @@ class LocationService : Service(){
                 Log.d("notification", "\"Location : ($lat, $long)\"\n" +
                         "                    + \"\\nOrientation : $orientation\"\n" +
                         "                    + \"\\nSpeed : $speed\"")
-                if(VehicleService.isRunning()) {
+                if(PedestrianService.isRunning()) {
                     _locationUpdate.emit(location)
                     Log.d("Location", "emit")
                 }

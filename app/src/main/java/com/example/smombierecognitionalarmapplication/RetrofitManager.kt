@@ -39,4 +39,44 @@ class RetrofitManager {
             }
         })
     }
+
+    fun createUser(userModeDTO : UserModeDTO){
+        val call = apiService.postUserMode(userModeDTO)
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                Log.d("Server Response", response.code().toString())
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.d("Server Response", "Fail")
+                t.printStackTrace()
+            }
+        })
+
+    }
+
+    fun postAPInfo(apInfoDTO: APInfoDTO){
+        val call = apiService.postAPInfo(apInfoDTO)
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                Log.d("Server Response", response.code().toString())
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.d("Server Response", "Fail")
+                t.printStackTrace()
+            }
+        })
+    }
+
+    fun patchUserData(deviceId: String, userdatadto :UserDataDTO){
+        val call = apiService.patchUserData(deviceId, userdatadto)
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                Log.d("Server Response", response.code().toString())
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.d("Server Response", "Fail")
+                t.printStackTrace()
+            }
+        })
+    }
 }

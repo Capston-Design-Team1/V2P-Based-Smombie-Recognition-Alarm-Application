@@ -3,6 +3,9 @@ package com.example.smombierecognitionalarmapplication.utils
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import android.util.Log
+import com.example.smombierecognitionalarmapplication.RetrofitManager
+import com.example.smombierecognitionalarmapplication.UserModeDTO
 import java.util.UUID
 
 class PreferenceUtils(context: Context) {
@@ -28,6 +31,8 @@ class PreferenceUtils(context: Context) {
         if (uuid == "") {
             val createdUuid = UUID.randomUUID().toString()
             setString("UUID", createdUuid)
+            RetrofitManager().createUser(UserModeDTO(createdUuid, false))
+            Log.d("User", "create")
             return createdUuid
         }
         return uuid

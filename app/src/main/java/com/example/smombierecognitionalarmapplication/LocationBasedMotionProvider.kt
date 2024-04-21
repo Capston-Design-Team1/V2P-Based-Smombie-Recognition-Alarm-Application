@@ -61,6 +61,6 @@ class LocationBasedMotionProvider() : MovementAnalyzer{
     }
 
     override fun registerServiceListener() {
-        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 6000L).build()
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 4000L).build()
     }
 }

@@ -1,5 +1,6 @@
 package com.example.smombierecognitionalarmapplication
 
+import android.location.Location
 import com.google.gson.annotations.SerializedName
 
 data class UserDataDTO(
@@ -8,13 +9,24 @@ data class UserDataDTO(
     @SerializedName("longitude")
     val longitude: Double,
     @SerializedName("speed")
-    val speed: Double,
+    val speed: Float,
     @SerializedName("direction")
-    val direction: Double,
+    val direction: Float,
     @SerializedName("mode")
     val mode: Boolean,
     @SerializedName("smombie")
     val smombie: Boolean,
     @SerializedName("apName")
     val apName: String
-)
+){
+    constructor(location: Location, mode: Boolean, isSmombie: Boolean, apName: String) :
+            this(
+                latitude = location.latitude,
+                longitude = location.longitude,
+                speed = location.speed,
+                direction = location.bearing,
+                mode = mode,
+                smombie = isSmombie,
+                apName = apName
+            )
+}

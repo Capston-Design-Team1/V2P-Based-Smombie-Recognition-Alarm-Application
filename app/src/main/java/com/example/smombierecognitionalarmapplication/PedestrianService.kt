@@ -9,10 +9,12 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.smombierecognitionalarmapplication.utils.LOCATION_DB_NOTIFICATION_ID
 import com.example.smombierecognitionalarmapplication.utils.LOCATION_NOTIFICATION_CHANNEL_ID
+import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 class PedestrianService : Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -60,8 +62,18 @@ class PedestrianService : Service() {
             .setContentText("Running...")
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setOngoing(true)
-
+        val retrofitManager = RetrofitManager()
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val prefUtil = PreferenceUtils(applicationContext)
+        val isSmombie = false
+        val apName = "newAP"
+        serviceScope.launch {
+            LocationService.locationUpdate.collect{ location ->
+                val userDataDTO = UserDataDTO(location, false, isSmombie, apName)
+                retrofitManager.patchUserData(prefUtil.getUuid(), userDataDTO)
+            }
+        }
 
         notificationManager.notify(LOCATION_DB_NOTIFICATION_ID, notification.build())
         startForeground(LOCATION_DB_NOTIFICATION_ID, notification.build())
