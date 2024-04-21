@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -49,12 +48,6 @@ android {
         }
     }
 }
-secrets {
-    propertiesFileName = "secrets.properties"
-    defaultPropertiesFileName = "local.defaults.properties"
-    ignoreList.add("keyToIgnore")
-    ignoreList.add("sdk.*")
-}
 
 dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -82,6 +75,5 @@ dependencies {
 
     implementation("com.google.maps.android:maps-compose:2.5.3")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.gms:play-services-location:21.2.0")
-
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
 }
