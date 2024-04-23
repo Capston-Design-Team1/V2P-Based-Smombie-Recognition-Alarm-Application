@@ -73,7 +73,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("com.google.maps.android:maps-compose:2.5.3")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
+    ////////////////////////////////////////////////////////
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.volley)
 }
