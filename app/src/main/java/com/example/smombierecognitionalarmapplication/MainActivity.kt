@@ -3,8 +3,6 @@ package com.example.smombierecognitionalarmapplication
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -19,26 +17,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
-import androidx.work.WorkManager
 import com.example.smombierecognitionalarmapplication.ui.theme.SmombieRecognitionAlarmApplicationTheme
 import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
 import com.example.smombierecognitionalarmapplication.utils.hasLocationPermission
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var geofenceManager: GeofenceManager
-
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +41,6 @@ class MainActivity : ComponentActivity() {
 //                Manifest.permission.ACCESS_FINE_LOCATION,
 //            ),
 //            0
-//        )
 
         var permissionArray = arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -95,6 +85,7 @@ class MainActivity : ComponentActivity() {
 //        )
 
         val prefUtil = PreferenceUtils(applicationContext)
+        val retrofitManager = RetrofitManager()
 
         geofenceManager = GeofenceManager(this)
         if(!LocationService.isRunning() and hasLocationPermission()){
@@ -106,9 +97,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Button(onClick = {
-                        prefUtil.setUserMode(false)
+                        prefUtil.setUserMode(true)
+                        retrofitManager.createUser(UserModeDTO(prefUtil.getUuid(), true))
+
                         if (geofenceManager.geofenceList.isNotEmpty() and hasLocationPermission()) {
-                            CoroutineScope(Job() + Dispatchers.IO).launch {
+                            CoroutineScope(Dispatchers.IO).launch {
                                 geofenceManager.registerGeofence()
                             }
                         } else {
@@ -124,6 +117,7 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
                         prefUtil.setUserMode(false)
+                        retrofitManager.createUser(UserModeDTO(prefUtil.getUuid(), true))
                         if (hasLocationPermission()) {
                             CoroutineScope(Job() + Dispatchers.IO).launch {
                                 geofenceManager.deregisterGeofence()

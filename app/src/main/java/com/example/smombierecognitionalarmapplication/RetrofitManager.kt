@@ -1,15 +1,23 @@
 package com.example.smombierecognitionalarmapplication
 
+import android.content.Context
 import android.util.Log
 import com.example.smombierecognitionalarmapplication.utils.APIBASE_URL
+import com.example.smombierecognitionalarmapplication.utils.HTTPResponseCheck
 import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.awaitResponse
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 
-class RetrofitManager {
+class RetrofitManager{
     companion object{
         val retrofit by lazy {
             Retrofit.Builder().apply {
@@ -22,22 +30,22 @@ class RetrofitManager {
         }
     }
 
-    fun getSmombieData(deviceId : String){
+    suspend fun getSmombieData(deviceId : String){
         val call = apiService.getSmombies(deviceId)
-        call.enqueue(object : Callback<List<SmombiesDTO>> {
-            override fun onResponse(
-                call: Call<List<SmombiesDTO>>,
-                response: Response<List<SmombiesDTO>>
-            ) {
-                val callbackList = response.body()
-                Log.d("Server Response", callbackList.toString())
-            }
+        call.awaitResponse().runCatching {
+            if(isSuccessful and HTTPResponseCheck(code())){
+                val responselist = body() ?: return
+                withContext(Dispatchers.Main) {
+                    responselist.forEach { //병렬 처리 로직 추가
+                        smombies -> {
 
-            override fun onFailure(call: Call<List<SmombiesDTO>>, t: Throwable) {
-                Log.d("Server Response", "Error")
-                t.printStackTrace()
+                        }
+                    }
+                }
             }
-        })
+        }.onFailure {
+            exception -> exception.printStackTrace()
+        }
     }
 
     fun createUser(userModeDTO : UserModeDTO){

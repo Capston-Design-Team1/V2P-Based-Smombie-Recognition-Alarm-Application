@@ -33,11 +33,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SmombieRecognitionAlarmApplication"
         tools:targetApi="34">
+
         <receiver android:name=".GeofenceBroadcastReceiver" android:exported="true"/>
         <receiver android:name=".UserActivityTransitionBroadcastReceiver" android:exported="false"/>
+        <receiver android:name=".ScreenStateReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.SCREEN_ON" />
+                <action android:name="android.intent.action.SCREEN_OFF" />
+            </intent-filter>
+        </receiver>
+
         <service android:name=".LocationService" android:foregroundServiceType="location"/>
         <service android:name=".PedestrianService" android:foregroundServiceType="dataSync"/>
         <service android:name=".VehicleService" android:foregroundServiceType="dataSync"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

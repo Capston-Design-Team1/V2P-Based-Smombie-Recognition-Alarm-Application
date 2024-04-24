@@ -88,7 +88,6 @@ class LocationService : Service(){
                         "                    + \"\\nSpeed : $speed\"")
                 if(PedestrianService.isRunning()) {
                     _locationUpdate.emit(location)
-                    Log.d("Location", "emit")
                 }
             }.launchIn(serviceScope)
 

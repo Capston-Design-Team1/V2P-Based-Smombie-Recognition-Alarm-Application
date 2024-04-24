@@ -5,17 +5,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 
 class GeofenceBroadcastReceiver : BroadcastReceiver(){
@@ -42,20 +35,22 @@ class GeofenceBroadcastReceiver : BroadcastReceiver(){
                 //pedestrian
                 true -> {
                     stopVehicleService(context)
-                    CoroutineScope(Job() + Dispatchers.IO).launch{
-                        UserActivityTransitionManager(context).registerActivityTransitions()
+                    if (!PedestrianService.isRunning()) {
+                        startPedestrianService(context)
                     }
-
+//                    CoroutineScope(Dispatchers.IO).launch{
+//                        UserActivityTransitionManager(context).registerActivityTransitions()
+//                    }
                 }
                 //vehicle
                 false -> {
-                    Log.d("UserActivityTransition", "Start")
+                    stopPedestrianService(context)
                     if (!VehicleService.isRunning()) {
                         startVehicleService(context)
                     }
-                    CoroutineScope(Job() + Dispatchers.IO).launch{
-                        UserActivityTransitionManager(context).deregisterActivityTransitions()
-                    }
+//                    CoroutineScope(Dispatchers.IO).launch{
+//                        UserActivityTransitionManager(context).deregisterActivityTransitions()
+//                    }
                 }
             }
         }
@@ -71,6 +66,20 @@ class GeofenceBroadcastReceiver : BroadcastReceiver(){
     private fun stopVehicleService(context: Context){
         Intent(context, VehicleService::class.java).apply {
             action = VehicleService.ACTION_STOP
+            context.startService(this)
+        }
+    }
+
+    private fun startPedestrianService(context: Context){
+        Intent(context, PedestrianService::class.java).apply {
+            action = PedestrianService.ACTION_START
+            context.startService(this)
+        }
+    }
+
+    private fun stopPedestrianService(context: Context){
+        Intent(context, PedestrianService::class.java).apply {
+            action = PedestrianService.ACTION_STOP
             context.startService(this)
         }
     }

@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import com.example.smombierecognitionalarmapplication.utils.LOCATION_DB_NOTIFICATION_ID
 import com.example.smombierecognitionalarmapplication.utils.LOCATION_NOTIFICATION_CHANNEL_ID
 import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
+import com.example.smombierecognitionalarmapplication.utils.checkMemoryUsageHigh
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -66,12 +67,17 @@ class PedestrianService : Service() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val prefUtil = PreferenceUtils(applicationContext)
-        val isSmombie = false
-        val apName = "newAP"
+
+        val apName = "newAP" // Modify Required
         serviceScope.launch {
             LocationService.locationUpdate.collect{ location ->
-                val userDataDTO = UserDataDTO(location, false, isSmombie, apName)
-                retrofitManager.patchUserData(prefUtil.getUuid(), userDataDTO)
+                if(ScreenStateReceiver.isScreenOn and checkMemoryUsageHigh(applicationContext)){
+                    val userDataDTO = UserDataDTO(location, true, true, apName)
+                    retrofitManager.patchUserData(prefUtil.getUuid(), userDataDTO)
+                } else {
+                    val userDataDTO = UserDataDTO(location, true, false, apName)
+                    retrofitManager.patchUserData(prefUtil.getUuid(), userDataDTO)
+                }
             }
         }
 

@@ -13,10 +13,12 @@ import com.example.smombierecognitionalarmapplication.utils.LOCATION_NOTIFICATIO
 import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
 import com.example.smombierecognitionalarmapplication.utils.SMOMBIEALERT_NOTIFICATION_CHANNEL_ID
 import com.example.smombierecognitionalarmapplication.utils.SMOMBIEALERT_NOTIFICATION_ID
+import com.example.smombierecognitionalarmapplication.utils.checkMemoryUsageHigh
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -68,21 +70,26 @@ class VehicleService : Service(){
             .setContentText("Running...")
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setOngoing(true)
-
+        val prefUtil = PreferenceUtils(applicationContext)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val retrofitManager = RetrofitManager()
         val userId = PreferenceUtils(applicationContext).getUuid()
         notificationManager.getNotificationChannel(SMOMBIEALERT_NOTIFICATION_CHANNEL_ID)
+        val apName = "newAP" // Modify Required
         serviceScope.launch{
             LocationService.locationUpdate.collect{ location ->
-                val smombieDataList = retrofitManager.getSmombieData(userId)
-                Log.d("Vehicle", "Running" + smombieDataList.toString())
+                val userDataDTO = UserDataDTO(location, false, false, apName)
+                retrofitManager.patchUserData(prefUtil.getUuid(), userDataDTO)
+
+                delay(500L)
+                retrofitManager.getSmombieData(userId)
                 val updatedNotification = notification.setContentText(
                     location.toString()
                 )
                 /*
                     특정 사용자에게서 100초 이내로 다시 알림 받을 수 없도록 만들기.
                  */
+
                 notificationManager.notify(SMOMBIEALERT_NOTIFICATION_ID, updatedNotification.build())
             }
         }
