@@ -6,15 +6,18 @@ import android.content.Intent
 
 class ScreenStateReceiver : BroadcastReceiver() {
     companion object{
-        var isScreenOn : Boolean = true
+        private var screenOn : Boolean = true
+        fun isScreenOn() : Boolean{
+            return screenOn
+        }
     }
     override fun onReceive(context: Context?, intent: Intent?) {
         when(intent?.action){
             Intent.ACTION_SCREEN_ON -> {
-                isScreenOn = true
+                screenOn = true
             }
             Intent.ACTION_SCREEN_OFF -> {
-                isScreenOn = false
+                screenOn = false
             }
         }
     }

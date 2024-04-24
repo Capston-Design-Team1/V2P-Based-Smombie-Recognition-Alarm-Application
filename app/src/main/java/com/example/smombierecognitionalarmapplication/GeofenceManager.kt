@@ -30,6 +30,8 @@ class GeofenceManager(context: Context) {
             context,
             CUSTOM_REQUEST_CODE_GEOFENCE,
             Intent(context, GeofenceBroadcastReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT
+            or
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 PendingIntent.FLAG_CANCEL_CURRENT
             } else {

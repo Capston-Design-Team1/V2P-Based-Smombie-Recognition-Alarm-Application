@@ -1,6 +1,7 @@
 package com.example.smombierecognitionalarmapplication
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.location.Location
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.smombierecognitionalarmapplication.utils.CUSTOM_REQUEST_CODE_MAIN
 import com.example.smombierecognitionalarmapplication.utils.LOCATION_NOTIFICATION_CHANNEL_ID
 import com.example.smombierecognitionalarmapplication.utils.LOCATION_NOTIFICATION_ID
 import kotlinx.coroutines.CoroutineScope
@@ -23,7 +25,6 @@ import kotlinx.coroutines.flow.onEach
 class LocationService : Service(){
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var locationBasedMotionProvider = LocationBasedMotionProvider()
-
 
     companion object{
         const val ACTION_START = "ACTION_START"
@@ -65,10 +66,21 @@ class LocationService : Service(){
     }
 
     private fun start() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val gotoMain = PendingIntent.getActivity(
+            this,
+            CUSTOM_REQUEST_CODE_MAIN,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification = NotificationCompat.Builder(this, LOCATION_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Location")
-            .setContentText("IDLE")
+            .setContentTitle("Location Service")
+            .setContentText("Running...")
             .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentIntent(gotoMain)
             .setOngoing(true)
 
         locationBasedMotionProvider.initServiceManager(this)

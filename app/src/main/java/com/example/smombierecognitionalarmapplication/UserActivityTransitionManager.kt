@@ -17,14 +17,11 @@ class UserActivityTransitionManager(context: Context) {
     companion object {
         fun getActivityType(int: Int): String {
             return when (int) {
-                0 -> "IN_VEHICLE"
-                1 -> "ON_BICYCLE"
-                2 -> "ON_FOOT"
-                3 -> "STILL"
-                4 -> "UNKNOWN"
-                5 -> "TILTING"
-                7 -> "WALKING"
-                8 -> "RUNNING"
+                DetectedActivity.STILL -> "STILL"
+                DetectedActivity.WALKING -> "WALKING"
+                DetectedActivity.RUNNING -> "RUNNING"
+                DetectedActivity.TILTING -> "TILTING"
+                DetectedActivity.ON_FOOT -> "ON_FOOT"
                 else -> "UNKNOWN"
             }
         }
@@ -36,34 +33,25 @@ class UserActivityTransitionManager(context: Context) {
                 else -> ""
             }
         }
+
+        private var isUserActivityTransitionRegistered = false
+        fun isRegistered() : Boolean{
+            return isUserActivityTransitionRegistered
+        }
     }
-    // list of activity transitions to be monitored
+    // List of activity transitions to be monitored for walking, running, and being still
     private val activityTransitions: List<ActivityTransition> by lazy {
         listOf(
-            getUserActivity(
-                DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_ENTER
-            ),
-            getUserActivity(
-                DetectedActivity.IN_VEHICLE, ActivityTransition.ACTIVITY_TRANSITION_EXIT
-            ),
-            getUserActivity(
-                DetectedActivity.ON_BICYCLE, ActivityTransition.ACTIVITY_TRANSITION_ENTER
-            ),
-            getUserActivity(
-                DetectedActivity.ON_BICYCLE, ActivityTransition.ACTIVITY_TRANSITION_EXIT
-            ),
-            getUserActivity(
-                DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER
-            ),
-            getUserActivity(
-                DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT
-            ),
-            getUserActivity(
-                DetectedActivity.RUNNING, ActivityTransition.ACTIVITY_TRANSITION_ENTER
-            ),
-            getUserActivity(
-                DetectedActivity.RUNNING, ActivityTransition.ACTIVITY_TRANSITION_EXIT
-            ),
+            getUserActivity(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_ENTER),
+            getUserActivity(DetectedActivity.STILL, ActivityTransition.ACTIVITY_TRANSITION_EXIT),
+            getUserActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_ENTER),
+            getUserActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT),
+            getUserActivity(DetectedActivity.RUNNING, ActivityTransition.ACTIVITY_TRANSITION_ENTER),
+            getUserActivity(DetectedActivity.RUNNING, ActivityTransition.ACTIVITY_TRANSITION_EXIT),
+            getUserActivity(DetectedActivity.TILTING, ActivityTransition.ACTIVITY_TRANSITION_ENTER),
+            getUserActivity(DetectedActivity.TILTING, ActivityTransition.ACTIVITY_TRANSITION_EXIT),
+            getUserActivity(DetectedActivity.ON_FOOT, ActivityTransition.ACTIVITY_TRANSITION_ENTER),
+            getUserActivity(DetectedActivity.ON_FOOT, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
         )
     }
 
@@ -79,22 +67,30 @@ class UserActivityTransitionManager(context: Context) {
     }
 
     private fun getUserActivity(detectedActivity: Int, transitionType: Int): ActivityTransition {
-        return ActivityTransition.Builder().setActivityType(detectedActivity)
-            .setActivityTransition(transitionType).build()
+        return ActivityTransition.Builder()
+            .setActivityType(detectedActivity)
+            .setActivityTransition(transitionType)
+            .build()
     }
 
     @SuppressLint("InlinedApi")
     @RequiresPermission(ACTIVITY_RECOGNITION)
     suspend fun registerActivityTransitions() = kotlin.runCatching {
-        activityClient.requestActivityTransitionUpdates(
-            ActivityTransitionRequest(activityTransitions),
-            pendingIntent
-        ).await()
+        if (!isUserActivityTransitionRegistered) {
+            activityClient.requestActivityTransitionUpdates(
+                ActivityTransitionRequest(activityTransitions),
+                pendingIntent
+            ).await()
+            isUserActivityTransitionRegistered = true
+        }
     }
 
     @SuppressLint("InlinedApi")
     @RequiresPermission(ACTIVITY_RECOGNITION)
     suspend fun deregisterActivityTransitions() = kotlin.runCatching {
-        activityClient.removeActivityUpdates(pendingIntent).await()
+        if (isUserActivityTransitionRegistered) {
+            activityClient.removeActivityUpdates(pendingIntent).await()
+            isUserActivityTransitionRegistered = false
+        }
     }
 }

@@ -9,6 +9,9 @@ import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class GeofenceBroadcastReceiver : BroadcastReceiver(){
@@ -37,10 +40,10 @@ class GeofenceBroadcastReceiver : BroadcastReceiver(){
                     stopVehicleService(context)
                     if (!PedestrianService.isRunning()) {
                         startPedestrianService(context)
+                        CoroutineScope(Dispatchers.IO).launch{
+                            UserActivityTransitionManager(context).registerActivityTransitions()
+                        }
                     }
-//                    CoroutineScope(Dispatchers.IO).launch{
-//                        UserActivityTransitionManager(context).registerActivityTransitions()
-//                    }
                 }
                 //vehicle
                 false -> {
@@ -48,9 +51,9 @@ class GeofenceBroadcastReceiver : BroadcastReceiver(){
                     if (!VehicleService.isRunning()) {
                         startVehicleService(context)
                     }
-//                    CoroutineScope(Dispatchers.IO).launch{
-//                        UserActivityTransitionManager(context).deregisterActivityTransitions()
-//                    }
+                    CoroutineScope(Dispatchers.IO).launch{
+                        UserActivityTransitionManager(context).deregisterActivityTransitions()
+                    }
                 }
             }
         }

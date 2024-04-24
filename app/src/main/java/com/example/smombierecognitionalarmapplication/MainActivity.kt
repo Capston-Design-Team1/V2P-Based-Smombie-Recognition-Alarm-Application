@@ -123,6 +123,7 @@ class MainActivity : ComponentActivity() {
                                 geofenceManager.deregisterGeofence()
                             }
                             stopLocationService()
+
                         } else {
                             Toast.makeText(
                                 this@MainActivity,

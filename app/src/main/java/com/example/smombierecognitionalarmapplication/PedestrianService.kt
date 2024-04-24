@@ -71,7 +71,7 @@ class PedestrianService : Service() {
         val apName = "newAP" // Modify Required
         serviceScope.launch {
             LocationService.locationUpdate.collect{ location ->
-                if(ScreenStateReceiver.isScreenOn and checkMemoryUsageHigh(applicationContext)){
+                if(ScreenStateReceiver.isScreenOn() and checkMemoryUsageHigh(applicationContext)){
                     val userDataDTO = UserDataDTO(location, true, true, apName)
                     retrofitManager.patchUserData(prefUtil.getUuid(), userDataDTO)
                 } else {
