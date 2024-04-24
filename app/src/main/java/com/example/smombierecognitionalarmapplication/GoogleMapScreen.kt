@@ -19,6 +19,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -69,7 +70,7 @@ class GoogleMapScreen : ComponentActivity() {
                         lastLocation = LatLng(location.latitude,location.longitude)
                         Log.d("current location","$lastLocation")
                         setContent{
-                            MapScreenWithMarker(lastLocation)
+                            MapScreenWithMarker(lastLocation,null)
                         }
                     }
                 }
@@ -80,7 +81,7 @@ class GoogleMapScreen : ComponentActivity() {
 }
 
 @Composable
-fun MapScreenWithMarker(currentLocation:LatLng) {
+fun MapScreenWithMarker(currentLocation:LatLng, smombies: List<SmombiesDTO>?) {
     // change color of the marker
     // implement onClick with popup composable
 
@@ -95,5 +96,33 @@ fun MapScreenWithMarker(currentLocation:LatLng) {
             state = MarkerState(position = currentLocation),
             title = "Current location"
         )
+        // 왜 smombieDTo가 아니라 smombiesDTo를 사용할까?
+        // smombie마다 risklevel이 다른데 같이 해도 되나?
+        smombies?.forEach { smombie ->
+            RiskMarker(
+                position = LatLng(
+                    smombie.smombieLocationListDTO[0].latitude,
+                    smombie.smombieLocationListDTO[0].longitude),
+                title = "Smombie",
+                snippet = "Risk Level :"+smombie.riskLevel,
+                risk = smombie.riskLevel)
+        }
     }
+}
+
+@Composable
+fun RiskMarker(
+    position: LatLng,
+    title: String,
+    snippet: String,
+    risk: Int
+) {
+    val hue = risk.toFloat()+200
+    val icon = BitmapDescriptorFactory.defaultMarker(hue)
+    Marker(
+        state = MarkerState(position=position),
+        title = title,
+        snippet = snippet,
+        icon = icon,
+    )
 }
