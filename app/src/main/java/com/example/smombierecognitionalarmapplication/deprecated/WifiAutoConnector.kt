@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication.utils
+package com.example.smombierecognitionalarmapplication.deprecated
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -20,7 +20,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
+@Deprecated("WifiAutoConnector")
 class WifiAutoConnector {
     interface WifiInfoCallback {
         fun onWifiInfoRetrieved(info: String)

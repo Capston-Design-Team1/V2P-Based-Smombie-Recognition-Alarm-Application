@@ -1,11 +1,12 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.data.useractivitytransition
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.example.smombierecognitionalarmapplication.UserActivityTransitionManager.Companion.getActivityType
-import com.example.smombierecognitionalarmapplication.UserActivityTransitionManager.Companion.getTransitionType
+import com.example.smombierecognitionalarmapplication.data.useractivitytransition.UserActivityTransitionManager.Companion.getActivityType
+import com.example.smombierecognitionalarmapplication.data.useractivitytransition.UserActivityTransitionManager.Companion.getTransitionType
+import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
 
 import com.google.android.gms.location.ActivityTransitionResult
 

@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication.utils
+package com.example.smombierecognitionalarmapplication.common.utils
 
 suspend fun HTTPResponseCheck(code : Int) : Boolean{
     when(code){

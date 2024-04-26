@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.domain.location
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -9,9 +9,13 @@ import android.location.Location
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.smombierecognitionalarmapplication.utils.CUSTOM_REQUEST_CODE_MAIN
-import com.example.smombierecognitionalarmapplication.utils.LOCATION_NOTIFICATION_CHANNEL_ID
-import com.example.smombierecognitionalarmapplication.utils.LOCATION_NOTIFICATION_ID
+import com.example.smombierecognitionalarmapplication.data.location.LocationBasedMotionProvider
+import com.example.smombierecognitionalarmapplication.MainActivity
+import com.example.smombierecognitionalarmapplication.R
+import com.example.smombierecognitionalarmapplication.data.CUSTOM_REQUEST_CODE_MAIN
+import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION_CHANNEL_ID
+import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION_ID
+import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

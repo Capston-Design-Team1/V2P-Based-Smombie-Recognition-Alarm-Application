@@ -22,7 +22,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
     <application
-        android:name=".SettingApp"
+        android:name=".data.notification.SettingApp"
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -34,18 +34,18 @@
         android:theme="@style/Theme.SmombieRecognitionAlarmApplication"
         tools:targetApi="34">
 
-        <receiver android:name=".GeofenceBroadcastReceiver" android:exported="true"/>
-        <receiver android:name=".UserActivityTransitionBroadcastReceiver" android:exported="false"/>
-        <receiver android:name=".ScreenStateReceiver" android:exported="false">
+        <receiver android:name=".data.geofence.GeofenceBroadcastReceiver" android:exported="true"/>
+        <receiver android:name=".data.useractivitytransition.UserActivityTransitionBroadcastReceiver" android:exported="false"/>
+        <receiver android:name=".common.utils.ScreenStateReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.SCREEN_ON" />
                 <action android:name="android.intent.action.SCREEN_OFF" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".LocationService" android:foregroundServiceType="location"/>
-        <service android:name=".PedestrianService" android:foregroundServiceType="dataSync"/>
-        <service android:name=".VehicleService" android:foregroundServiceType="dataSync"/>
+        <service android:name=".domain.location.LocationService" android:foregroundServiceType="location"/>
+        <service android:name=".domain.pedestrian.PedestrianService" android:foregroundServiceType="dataSync"/>
+        <service android:name=".domain.vehicle.VehicleService" android:foregroundServiceType="dataSync"/>
 
         <activity
             android:name=".MainActivity"

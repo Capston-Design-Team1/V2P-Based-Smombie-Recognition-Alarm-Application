@@ -1,5 +1,9 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.data.api
 
+import com.example.smombierecognitionalarmapplication.data.api.models.APInfoDTO
+import com.example.smombierecognitionalarmapplication.data.api.models.SmombiesDTO
+import com.example.smombierecognitionalarmapplication.data.api.models.UserDataDTO
+import com.example.smombierecognitionalarmapplication.data.api.models.UserModeDTO
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET

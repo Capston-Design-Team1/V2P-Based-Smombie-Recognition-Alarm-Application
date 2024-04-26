@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.data.useractivitytransition
 
 import android.Manifest.permission.ACTIVITY_RECOGNITION
 import android.annotation.SuppressLint
@@ -6,7 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.RequiresPermission
-import com.example.smombierecognitionalarmapplication.utils.CUSTOM_REQUEST_CODE_USER_ACTION
+import com.example.smombierecognitionalarmapplication.data.CUSTOM_REQUEST_CODE_USER_ACTION
 import com.google.android.gms.location.ActivityRecognition
 import com.google.android.gms.location.ActivityTransition
 import com.google.android.gms.location.ActivityTransitionRequest

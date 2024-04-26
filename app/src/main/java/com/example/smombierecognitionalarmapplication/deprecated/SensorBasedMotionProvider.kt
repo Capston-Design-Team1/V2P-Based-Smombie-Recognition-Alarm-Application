@@ -1,15 +1,20 @@
 package com.example.smombierecognitionalarmapplication.deprecated
 
 import android.content.Context
-import android.hardware.*
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventCallback
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.util.Log
-import com.example.smombierecognitionalarmapplication.MovementAnalyzer
+import com.example.smombierecognitionalarmapplication.data.location.MovementAnalyzer
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
+@Deprecated("SensorBasedMotionProvider")
 public class SensorBasedMotionProvider : MovementAnalyzer, SensorEventListener{
 
     private lateinit var sensorManager: SensorManager

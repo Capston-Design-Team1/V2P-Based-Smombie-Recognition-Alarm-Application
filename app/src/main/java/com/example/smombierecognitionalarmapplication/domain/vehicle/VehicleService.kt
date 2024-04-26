@@ -1,30 +1,26 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.domain.vehicle
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.smombierecognitionalarmapplication.utils.APIBASE_URL
-import com.example.smombierecognitionalarmapplication.utils.LOCATION_DB_NOTIFICATION_ID
-import com.example.smombierecognitionalarmapplication.utils.LOCATION_NOTIFICATION_CHANNEL_ID
-import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
-import com.example.smombierecognitionalarmapplication.utils.SMOMBIEALERT_NOTIFICATION_CHANNEL_ID
-import com.example.smombierecognitionalarmapplication.utils.SMOMBIEALERT_NOTIFICATION_ID
-import com.example.smombierecognitionalarmapplication.utils.checkMemoryUsageHigh
+import com.example.smombierecognitionalarmapplication.MainActivity
+import com.example.smombierecognitionalarmapplication.R
+import com.example.smombierecognitionalarmapplication.data.CUSTOM_REQUEST_CODE_MAIN
+import com.example.smombierecognitionalarmapplication.data.SMOMBIEALERT_NOTIFICATION_CHANNEL_ID
+import com.example.smombierecognitionalarmapplication.data.SMOMBIEALERT_NOTIFICATION_ID
+import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
+import com.example.smombierecognitionalarmapplication.data.api.models.UserDataDTO
+import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class VehicleService : Service(){
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -65,24 +61,33 @@ class VehicleService : Service(){
     }
 
     private fun start() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val gotoMain = PendingIntent.getActivity(
+            this,
+            CUSTOM_REQUEST_CODE_MAIN,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
         val notification = NotificationCompat.Builder(this, SMOMBIEALERT_NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Vehicle Service")
             .setContentText("Running...")
             .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentIntent(gotoMain)
             .setOngoing(true)
-        val prefUtil = PreferenceUtils(applicationContext)
+
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val retrofitManager = RetrofitManager()
-        val userId = PreferenceUtils(applicationContext).getUuid()
         notificationManager.getNotificationChannel(SMOMBIEALERT_NOTIFICATION_CHANNEL_ID)
         val apName = "newAP" // Modify Required
         serviceScope.launch{
             LocationService.locationUpdate.collect{ location ->
                 val userDataDTO = UserDataDTO(location, false, false, apName)
-                retrofitManager.patchUserData(prefUtil.getUuid(), userDataDTO)
+                retrofitManager.patchUserData(userDataDTO)
 
                 delay(500L)
-                retrofitManager.getSmombieData(userId)
+                retrofitManager.getSmombieData()
                 val updatedNotification = notification.setContentText(
                     location.toString()
                 )

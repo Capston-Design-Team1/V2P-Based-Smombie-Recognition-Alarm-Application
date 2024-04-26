@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.common.utils
 
 import android.content.BroadcastReceiver
 import android.content.Context

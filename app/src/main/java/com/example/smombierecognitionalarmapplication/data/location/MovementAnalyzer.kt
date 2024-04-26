@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.data.location
 
 import android.content.Context
 import android.location.Location

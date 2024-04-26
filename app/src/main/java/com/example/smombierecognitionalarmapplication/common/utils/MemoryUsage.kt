@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication.utils
+package com.example.smombierecognitionalarmapplication.common.utils
 
 import android.app.ActivityManager
 import android.content.Context
@@ -11,7 +11,6 @@ fun checkSystemMemoryUsage(context: Context): String {
     val availableMemory = memoryInfo.availMem / (1024 * 1024)
     val totalMemory = memoryInfo.totalMem / (1024 * 1024)
 
-    val usedMemoryPercentage = ((totalMemory - availableMemory).toFloat() / totalMemory) * 100
     return "Available Memory : ${availableMemory}MB\nTotal Memory : ${totalMemory}MB"
 }
 

@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.data.geofence
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
@@ -7,7 +7,7 @@ import android.content.Intent
 import android.location.Location
 import android.os.Build
 import android.util.Log
-import com.example.smombierecognitionalarmapplication.utils.CUSTOM_REQUEST_CODE_GEOFENCE
+import com.example.smombierecognitionalarmapplication.data.CUSTOM_REQUEST_CODE_GEOFENCE
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_DWELL
 import com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER

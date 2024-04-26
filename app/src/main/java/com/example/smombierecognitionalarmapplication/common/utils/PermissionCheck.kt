@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication.utils
+package com.example.smombierecognitionalarmapplication.common.utils
 
 import android.Manifest
 import android.content.Context

@@ -4,17 +4,17 @@ import android.content.Context
 import android.content.Intent
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.smombierecognitionalarmapplication.PedestrianService
-import com.example.smombierecognitionalarmapplication.VehicleService
-import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
+import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
+import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
+import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
 
+@Deprecated("GeofenceWorker")
 class GeofenceWorker(appContext: Context, workerParams : WorkerParameters) :
     CoroutineWorker(appContext, workerParams){
-    private val prefUtil = PreferenceUtils(appContext)
 
     override suspend fun doWork(): Result {
         runCatching {
-            when(prefUtil.getUserMode()){
+            when(PreferenceUtils.getUserMode()){
                 //pedestrian
                 true -> Intent(applicationContext, PedestrianService::class.java).apply {
                     action = PedestrianService.ACTION_START

@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication.utils
+package com.example.smombierecognitionalarmapplication.data
 
 //constants used for locations
 

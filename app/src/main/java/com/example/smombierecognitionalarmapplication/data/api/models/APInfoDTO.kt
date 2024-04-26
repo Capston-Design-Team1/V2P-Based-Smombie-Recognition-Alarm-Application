@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.data.api.models
 
 import com.google.gson.annotations.SerializedName
 

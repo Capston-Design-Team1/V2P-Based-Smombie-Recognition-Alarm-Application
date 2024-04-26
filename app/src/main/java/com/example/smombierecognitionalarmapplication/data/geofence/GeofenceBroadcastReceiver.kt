@@ -1,11 +1,14 @@
-package com.example.smombierecognitionalarmapplication
+package com.example.smombierecognitionalarmapplication.data.geofence
 
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.example.smombierecognitionalarmapplication.utils.PreferenceUtils
+import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
+import com.example.smombierecognitionalarmapplication.data.useractivitytransition.UserActivityTransitionManager
+import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
+import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
@@ -32,14 +35,13 @@ class GeofenceBroadcastReceiver : BroadcastReceiver(){
             "GeofenceReceiver",
             alertString
         )
-        val prefUtil = PreferenceUtils(context)
         if(geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL){
-            when(prefUtil.getUserMode()){
+            when(PreferenceUtils.getUserMode()){
                 //pedestrian
                 true -> {
                     stopVehicleService(context)
                     if (!PedestrianService.isRunning()) {
-                        startPedestrianService(context)
+//                        startPedestrianService(context)
                         CoroutineScope(Dispatchers.IO).launch{
                             UserActivityTransitionManager(context).registerActivityTransitions()
                         }
