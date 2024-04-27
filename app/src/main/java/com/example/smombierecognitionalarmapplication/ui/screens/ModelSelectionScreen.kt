@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication.ui
+package com.example.smombierecognitionalarmapplication.ui.screens
 
 import android.content.Intent
 import android.net.Uri
@@ -96,6 +96,7 @@ fun ModeSelectionScreen(navController: NavController, activity: ComponentActivit
 @Composable
 fun NavigationButtons(navController: NavController, activity: ComponentActivity) {
     val prefUtil = PreferenceUtils(activity.applicationContext)
+    prefUtil.createUuid()
     Column(
         modifier = Modifier
             .fillMaxSize()

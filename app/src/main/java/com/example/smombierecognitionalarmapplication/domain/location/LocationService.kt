@@ -9,13 +9,12 @@ import android.location.Location
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.smombierecognitionalarmapplication.data.location.LocationBasedMotionProvider
 import com.example.smombierecognitionalarmapplication.MainActivity
 import com.example.smombierecognitionalarmapplication.R
 import com.example.smombierecognitionalarmapplication.data.CUSTOM_REQUEST_CODE_MAIN
 import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION_CHANNEL_ID
 import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION_ID
-import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
+import com.example.smombierecognitionalarmapplication.data.location.LocationBasedMotionProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -49,7 +48,7 @@ class LocationService : Service(){
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("$flags", "$startId")
+        Log.d("Location Service$startId $flags", "start")
         if(intent == null){
             running = true
             start()
@@ -66,7 +65,7 @@ class LocationService : Service(){
             }
         }
 
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     private fun start() {
@@ -89,7 +88,6 @@ class LocationService : Service(){
 
         locationBasedMotionProvider.initServiceManager(this)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(LOCATION_NOTIFICATION_ID, notification.build())
         locationBasedMotionProvider.registerServiceListener()
         locationBasedMotionProvider
             .getMovementUpdates()
@@ -99,12 +97,10 @@ class LocationService : Service(){
                 val long = location.longitude.toString().take(5)
                 val orientation = location.bearing.toString()
                 val speed = location.speed.toString()
-                Log.d("notification", "\"Location : ($lat, $long)\"\n" +
-                        "                    + \"\\nOrientation : $orientation\"\n" +
-                        "                    + \"\\nSpeed : $speed\"")
-                if(PedestrianService.isRunning()) {
-                    _locationUpdate.emit(location)
-                }
+                Log.d("notification", "Location : ($lat, $long)\n" +
+                        "Orientation : $orientation\n" +
+                        "Speed : $speed")
+                _locationUpdate.emit(location)
             }.launchIn(serviceScope)
 
         startForeground(LOCATION_NOTIFICATION_ID, notification.build())

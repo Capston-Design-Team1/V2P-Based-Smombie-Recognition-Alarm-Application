@@ -15,7 +15,7 @@ interface APIService {
     @GET("users/{deviceId}/smombies")
     fun getSmombies(@Path("deviceId") deviceId: String) : Call<List<SmombiesDTO>>
     @POST("users")
-    fun postUserMode(@Body userMode: UserModeDTO) : Call<Void>
+    fun postUserCreation(@Body userMode: UserModeDTO) : Call<Void>
     @POST("ap")
     fun postAPInfo(@Body apInfo : APInfoDTO) : Call<Void>
     @PATCH("users/{deviceId}")

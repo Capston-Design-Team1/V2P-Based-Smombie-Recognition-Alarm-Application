@@ -1,4 +1,4 @@
-package com.example.smombierecognitionalarmapplication.ui
+package com.example.smombierecognitionalarmapplication.ui.screens
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Switch

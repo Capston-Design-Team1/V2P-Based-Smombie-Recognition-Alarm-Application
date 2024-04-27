@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.util.Log
-import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
+import java.util.UUID
 
 class PreferenceUtils(context: Context) {
     companion object{
@@ -33,12 +33,12 @@ class PreferenceUtils(context: Context) {
         prefUUID.edit().putString(key, str).apply()
     }
 
-    suspend fun createUuid() {
-        val uuid = getString("UUID", "")
+    fun createUuid() {
+        var uuid = getString("UUID", "")
         if (uuid == "") {
-            val createdUuid = RetrofitManager().createUser()
-            setString("UUID", createdUuid)
-            DEVICE_ID = createdUuid
+            uuid = UUID.randomUUID().toString()
+            setString("UUID", uuid)
+            DEVICE_ID = uuid
             Log.d("User", "create")
         } else {
             DEVICE_ID = uuid

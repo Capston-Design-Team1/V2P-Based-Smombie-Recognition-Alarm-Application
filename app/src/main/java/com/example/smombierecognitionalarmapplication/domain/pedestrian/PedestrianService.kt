@@ -1,10 +1,8 @@
 package com.example.smombierecognitionalarmapplication.domain.pedestrian
 
 import android.annotation.SuppressLint
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -60,7 +58,7 @@ class PedestrianService : Service() {
             }
         }
 
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     @SuppressLint("MissingPermission")
@@ -81,8 +79,6 @@ class PedestrianService : Service() {
             .setContentIntent(gotoMain)
             .setOngoing(true)
         val retrofitManager = RetrofitManager()
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
         val apName = "newAP" // Modify Required
         serviceScope.launch {
             LocationService.locationUpdate.collect{ location ->
@@ -95,8 +91,6 @@ class PedestrianService : Service() {
                 }
             }
         }
-
-        notificationManager.notify(LOCATION_DB_NOTIFICATION_ID, notification.build())
         startForeground(LOCATION_DB_NOTIFICATION_ID, notification.build())
     }
 

@@ -26,6 +26,12 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.smombierecognitionalarmapplication.ui.screens.HomeScreen
+import com.example.smombierecognitionalarmapplication.ui.screens.MapLoadingDialog
+import com.example.smombierecognitionalarmapplication.ui.screens.MapScreen
+import com.example.smombierecognitionalarmapplication.ui.screens.ModeSelectionScreen
+import com.example.smombierecognitionalarmapplication.ui.screens.SettingsScreen
+import com.example.smombierecognitionalarmapplication.ui.screens.SplashScreen
 
 @Composable
 fun AppNavigation(activity: ComponentActivity) {
@@ -71,7 +77,7 @@ data class BottomNavigationItem(
             BottomNavigationItem(
                 label = "Map",
                 icon = Icons.Filled.LocationOn,
-                route = "map"
+                route = "loading"
             ),
             BottomNavigationItem(
                 label = "Settings",
@@ -185,7 +191,9 @@ fun VehicleNavigation(activity: ComponentActivity) {
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { HomeScreen(activity, true) }
+            composable("home") { HomeScreen(activity, false) }
+            composable("map") { MapScreen() }
+            composable("loading") { MapLoadingDialog(activity, navController)}
             composable("settings") { SettingsScreen() }
         }
     }

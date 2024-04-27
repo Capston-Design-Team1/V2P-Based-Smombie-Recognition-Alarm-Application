@@ -1,9 +1,8 @@
-package com.example.smombierecognitionalarmapplication.ui
+package com.example.smombierecognitionalarmapplication.ui.screens
 
 import android.content.Context
 import android.content.Intent
 import android.location.Location
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
@@ -24,18 +23,17 @@ import com.example.smombierecognitionalarmapplication.common.utils.isInternetCon
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.data.api.models.APInfoDTO
 import com.example.smombierecognitionalarmapplication.data.geofence.GeofenceManager
-import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
+import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
+import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(activity: ComponentActivity, userMode : Boolean){
     val geofenceManager = GeofenceManager(activity.applicationContext)
     val retrofitManager = RetrofitManager()
-    val prefUtils = PreferenceUtils(activity.applicationContext)
     Column(
         modifier = Modifier.fillMaxSize().padding(30.dp),
         verticalArrangement = Arrangement.Center,
@@ -53,14 +51,10 @@ fun HomeScreen(activity: ComponentActivity, userMode : Boolean){
                             },
                         )
                         geofenceManager.registerGeofence()
-                        prefUtils.createUuid()
-                        delay(500)
-                        prefUtils.setUserMode(userMode)
                         retrofitManager.postUserMode()
                         retrofitManager.postAPInfo(APInfoDTO("newAP", 37.4221, -122.0852)) // Modify Required
                     }
                     if(!LocationService.isRunning()){
-                        Log.d("Start", "StartLocationService")
                         startLocationService(activity.applicationContext)
                     }
                     sendAppToBackground(activity)
@@ -79,7 +73,10 @@ fun HomeScreen(activity: ComponentActivity, userMode : Boolean){
         Spacer(modifier = Modifier.height(60.dp))
         Button(
             onClick = {
+                stopPedestrianService(activity.applicationContext)
+                stopVehicleService(activity.applicationContext)
                 stopLocationService(activity.applicationContext)
+
                 CoroutineScope(Dispatchers.IO).launch {
                     geofenceManager.deregisterGeofence()
                 }
@@ -102,7 +99,7 @@ private fun startLocationService(context : Context){
 private fun stopLocationService(context : Context){
     Intent(context, LocationService::class.java).apply {
         action = LocationService.ACTION_STOP
-        context.startForegroundService(this)
+        context.stopService(this)
     }
 }
 
@@ -112,4 +109,18 @@ private fun sendAppToBackground(context: Context){
         flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
     }
     context.startActivity(homeIntent)
+}
+
+private fun stopVehicleService(context: Context){
+    Intent(context, VehicleService::class.java).apply {
+        action = VehicleService.ACTION_STOP
+        context.stopService(this)
+    }
+}
+
+private fun stopPedestrianService(context: Context){
+    Intent(context, PedestrianService::class.java).apply {
+        action = PedestrianService.ACTION_STOP
+        context.stopService(this)
+    }
 }

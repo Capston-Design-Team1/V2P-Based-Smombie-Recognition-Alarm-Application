@@ -8,7 +8,6 @@ import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION
 import com.example.smombierecognitionalarmapplication.data.SMOMBIEALERT_NOTIFICATION_CHANNEL_ID
 
 class SettingApp : Application() {
-
     override fun onCreate() {
         super.onCreate()
         val locationChannel = NotificationChannel(

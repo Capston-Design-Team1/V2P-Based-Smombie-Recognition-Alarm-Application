@@ -6,10 +6,13 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.smombierecognitionalarmapplication.MainActivity
 import com.example.smombierecognitionalarmapplication.R
 import com.example.smombierecognitionalarmapplication.data.CUSTOM_REQUEST_CODE_MAIN
+import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION_CHANNEL_ID
+import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION_ID
 import com.example.smombierecognitionalarmapplication.data.SMOMBIEALERT_NOTIFICATION_CHANNEL_ID
 import com.example.smombierecognitionalarmapplication.data.SMOMBIEALERT_NOTIFICATION_ID
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
@@ -18,8 +21,8 @@ import com.example.smombierecognitionalarmapplication.domain.location.LocationSe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class VehicleService : Service(){
@@ -57,7 +60,7 @@ class VehicleService : Service(){
                 }
             }
         }
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
     private fun start() {
@@ -70,7 +73,15 @@ class VehicleService : Service(){
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )
-        val notification = NotificationCompat.Builder(this, SMOMBIEALERT_NOTIFICATION_CHANNEL_ID)
+
+        val alertNotification = NotificationCompat.Builder(this, SMOMBIEALERT_NOTIFICATION_CHANNEL_ID)
+            .setContentTitle("Alert")
+            .setContentText("Running...")
+            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setContentIntent(gotoMain)
+            .setAutoCancel(true)
+
+        val locationNotification = NotificationCompat.Builder(this, LOCATION_NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Vehicle Service")
             .setContentText("Running...")
             .setSmallIcon(R.drawable.ic_launcher_background)
@@ -79,27 +90,37 @@ class VehicleService : Service(){
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val retrofitManager = RetrofitManager()
-        notificationManager.getNotificationChannel(SMOMBIEALERT_NOTIFICATION_CHANNEL_ID)
+        notificationManager.getNotificationChannel(LOCATION_NOTIFICATION_CHANNEL_ID)
         val apName = "newAP" // Modify Required
         serviceScope.launch{
             LocationService.locationUpdate.collect{ location ->
                 val userDataDTO = UserDataDTO(location, false, false, apName)
                 retrofitManager.patchUserData(userDataDTO)
 
-                delay(500L)
-                retrofitManager.getSmombieData()
-                val updatedNotification = notification.setContentText(
-                    location.toString()
-                )
-                /*
-                    특정 사용자에게서 100초 이내로 다시 알림 받을 수 없도록 만들기.
-                 */
+                val alert = async {
+                    try {
+                        retrofitManager.getSmombieData()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        false
+                    }
+                }.await()
 
-                notificationManager.notify(SMOMBIEALERT_NOTIFICATION_ID, updatedNotification.build())
+                if (alert) {
+                    val updatedNotification = alertNotification.setContentText(
+                        location.toString()
+                    )
+                    notificationManager.notify(
+                        SMOMBIEALERT_NOTIFICATION_ID,
+                        updatedNotification.build()
+                    )
+                }
+
+                Log.d("Pedestrian", "Running")
             }
         }
 
-        startForeground(SMOMBIEALERT_NOTIFICATION_ID, notification.build())
+        startForeground(LOCATION_NOTIFICATION_ID, locationNotification.build())
     }
 
     private fun stop() {
