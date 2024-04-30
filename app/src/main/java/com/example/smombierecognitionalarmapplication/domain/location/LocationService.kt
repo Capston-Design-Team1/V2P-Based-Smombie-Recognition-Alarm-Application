@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
@@ -36,7 +37,10 @@ class LocationService : Service(){
         fun isRunning(): Boolean {
             return running
         }
-        private val _locationUpdate = MutableSharedFlow<Location>()
+        private val _locationUpdate = MutableSharedFlow<Location>(
+            extraBufferCapacity = 2,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST
+        )
         val locationUpdate = _locationUpdate.asSharedFlow()
     }
     override fun onBind(intent : Intent?): IBinder? {

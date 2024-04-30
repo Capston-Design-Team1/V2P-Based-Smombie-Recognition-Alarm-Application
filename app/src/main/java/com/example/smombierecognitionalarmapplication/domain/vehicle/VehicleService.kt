@@ -6,7 +6,6 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.smombierecognitionalarmapplication.MainActivity
 import com.example.smombierecognitionalarmapplication.R
@@ -21,9 +20,9 @@ import com.example.smombierecognitionalarmapplication.domain.location.LocationSe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class VehicleService : Service(){
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -97,26 +96,24 @@ class VehicleService : Service(){
                 val userDataDTO = UserDataDTO(location, false, false, apName)
                 retrofitManager.patchUserData(userDataDTO)
 
-                val alert = async {
-                    try {
-                        retrofitManager.getSmombieData()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        false
-                    }
-                }.await()
-
-                if (alert) {
-                    val updatedNotification = alertNotification.setContentText(
-                        location.toString()
-                    )
-                    notificationManager.notify(
-                        SMOMBIEALERT_NOTIFICATION_ID,
-                        updatedNotification.build()
-                    )
+                val alert = try {
+                    retrofitManager.getSmombieData()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    false
                 }
 
-                Log.d("Pedestrian", "Running")
+                if (alert) {
+                    withContext(Dispatchers.Main) {
+                        val updatedNotification = alertNotification.setContentText(
+                            location.toString()
+                        )
+                        notificationManager.notify(
+                            SMOMBIEALERT_NOTIFICATION_ID,
+                            updatedNotification.build()
+                        )
+                    }
+                }
             }
         }
 

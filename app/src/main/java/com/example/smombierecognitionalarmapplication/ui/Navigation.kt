@@ -192,7 +192,7 @@ fun VehicleNavigation(activity: ComponentActivity) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") { HomeScreen(activity, false) }
-            composable("map") { MapScreen() }
+            composable("map") { MapScreen(activity) }
             composable("loading") { MapLoadingDialog(activity, navController)}
             composable("settings") { SettingsScreen() }
         }

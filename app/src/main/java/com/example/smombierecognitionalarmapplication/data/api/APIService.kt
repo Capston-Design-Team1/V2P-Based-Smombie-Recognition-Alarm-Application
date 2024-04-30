@@ -13,7 +13,7 @@ import retrofit2.http.Path
 
 interface APIService {
     @GET("users/{deviceId}/smombies")
-    fun getSmombies(@Path("deviceId") deviceId: String) : Call<List<SmombiesDTO>>
+    fun getSmombies(@Path("deviceId") deviceId: String) : Call<SmombiesDTO>
     @POST("users")
     fun postUserCreation(@Body userMode: UserModeDTO) : Call<Void>
     @POST("ap")

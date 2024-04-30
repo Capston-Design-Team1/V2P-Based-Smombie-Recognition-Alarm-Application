@@ -1,11 +1,15 @@
 package com.example.smombierecognitionalarmapplication.ui.screens
 
+import android.content.Context
+import android.content.Intent
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateMapOf
@@ -15,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
+import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -24,17 +29,18 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun MapScreen() {
+fun MapScreen(activity: ComponentActivity) {
     val APPosition = LatLng(37.4221, -122.0852) //Modify Required
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(APPosition, 15f)
     }
 
     val currentLocation= LocationService.locationUpdate.collectAsState(initial = null).value
-    val smombiesLocation = RetrofitManager.smombieUpdate.collectAsState(initial = emptyList()).value
+    val smombiesLocation = RetrofitManager.smombieUpdate.collectAsState(initial = null).value
     val currentLocationMarkerState = rememberMarkerState(position = APPosition)
     val smombieMarkers = remember { mutableStateMapOf<String, Pair<LatLng, Int>>() }
 
@@ -53,11 +59,20 @@ fun MapScreen() {
     }
 
     LaunchedEffect(smombiesLocation) {
-        smombiesLocation?.forEachIndexed { risk, smombiesInfo ->
-            smombiesInfo.smombieLocationListDTO.forEach{ info ->
-                smombieMarkers[info.deviceId] = Pair(LatLng(info.latitude, info.longitude), risk)
+        val tasks =
+            listOf(
+                smombiesLocation?.riskLevel1 to 1,
+                smombiesLocation?.riskLevel2 to 2,
+                smombiesLocation?.riskLevel3 to 3
+            ).forEach { (riskLevelInfos, riskLevel) ->
+                riskLevelInfos?.let { infos ->
+                    launch {
+                        infos.forEach { info ->
+                            smombieMarkers[info.deviceId] = Pair(LatLng(info.latitude, info.longitude), riskLevel)
+                        }
+                    }
+                }
             }
-        }
     }
 
     GoogleMap(
@@ -84,6 +99,13 @@ fun MapScreen() {
     }
 
     AlarmDisplay()
+
+    DisposableEffect(Unit) {
+        onDispose {
+            stopLocationService(activity.applicationContext)
+            stopVehicleService(activity.applicationContext)
+        }
+    }
 }
 
 @Composable
@@ -130,5 +152,19 @@ private fun AlarmDisplay(){
             tint = Color.Yellow,
             modifier = Modifier.size(200.dp)
         )
+    }
+}
+
+private fun stopLocationService(context : Context){
+    Intent(context, LocationService::class.java).apply {
+        action = LocationService.ACTION_STOP
+        context.startForegroundService(this)
+    }
+}
+
+private fun stopVehicleService(context: Context){
+    Intent(context, VehicleService::class.java).apply {
+        action = VehicleService.ACTION_STOP
+        context.startForegroundService(this)
     }
 }

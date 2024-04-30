@@ -35,7 +35,7 @@ class RetrofitManager{
         val apiService : APIService by lazy {
             retrofit.create(APIService::class.java)
         }
-        private val _smombieUpdate = MutableSharedFlow<List<SmombiesDTO>?>()
+        private val _smombieUpdate = MutableSharedFlow<SmombiesDTO?>()
         val smombieUpdate = _smombieUpdate.asSharedFlow()
         private val _alarm = MutableSharedFlow<Boolean>()
         val alarm = _alarm.asSharedFlow()
@@ -51,9 +51,9 @@ class RetrofitManager{
         val call = apiService.getSmombies(PreferenceUtils.getDeviceID())
         call.awaitResponse().runCatching {
             if(HTTPResponseCheck(code())){
-                val responselist = body() ?: return false
-                _smombieUpdate.emit(responselist)
-                responselist[0].smombieLocationListDTO.forEach{
+                val response = body() ?: return false
+                _smombieUpdate.emit(response)
+                response.riskLevel1.forEach{
                     smombieInfo ->
                     withContext(Dispatchers.Default){
                         val key = smombieInfo.deviceId
