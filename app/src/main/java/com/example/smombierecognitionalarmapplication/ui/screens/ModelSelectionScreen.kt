@@ -1,5 +1,6 @@
 package com.example.smombierecognitionalarmapplication.ui.screens
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -28,7 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
+import com.example.smombierecognitionalarmapplication.domain.location.LocationService
+import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
+import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
 
 @Composable
 fun ModeSelectionScreen(navController: NavController, activity: ComponentActivity) {
@@ -63,7 +68,7 @@ fun ModeSelectionScreen(navController: NavController, activity: ComponentActivit
         val requestPermissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions()
         ) {
-                results ->
+            results ->
             permissionsGranted = results.all { it.value }
         }
         AlertDialog(
@@ -88,7 +93,10 @@ fun ModeSelectionScreen(navController: NavController, activity: ComponentActivit
         )
     }
 
-    if (permissionsGranted) {
+    if (permissionsGranted) { //Modify Required - 인터넷 연결 X or Server Request/Response 오류 시 Toast, Dialog 또는 Modal 창
+        stopLocationService(activity.applicationContext)
+        stopVehicleService(activity.applicationContext)
+        stopPedestrianService(activity.applicationContext)
         NavigationButtons(navController, activity)
     }
 }
@@ -96,6 +104,7 @@ fun ModeSelectionScreen(navController: NavController, activity: ComponentActivit
 @Composable
 fun NavigationButtons(navController: NavController, activity: ComponentActivity) {
     val prefUtil = PreferenceUtils(activity.applicationContext)
+    val retrofitManager = RetrofitManager()
     prefUtil.createUuid()
     Column(
         modifier = Modifier
@@ -107,6 +116,7 @@ fun NavigationButtons(navController: NavController, activity: ComponentActivity)
         Button(
             onClick = {
                 prefUtil.setUserMode(true)
+                retrofitManager.postUserMode()
                 navController.navigate("pedestrian")
             },
             modifier = Modifier.height(200.dp)
@@ -117,6 +127,7 @@ fun NavigationButtons(navController: NavController, activity: ComponentActivity)
         Button(
             onClick = {
                 prefUtil.setUserMode(false)
+                retrofitManager.postUserMode()
                 navController.navigate("vehicle")
             },
             modifier = Modifier.height(200.dp)
@@ -133,3 +144,25 @@ private fun showSettingsDialog(activity: ComponentActivity) {
         }
     )
 }
+
+private fun stopLocationService(context : Context){
+    Intent(context, LocationService::class.java).apply {
+        action = LocationService.ACTION_STOP
+        context.stopService(this)
+    }
+}
+
+private fun stopVehicleService(context: Context){
+    Intent(context, VehicleService::class.java).apply {
+        action = VehicleService.ACTION_STOP
+        context.stopService(this)
+    }
+}
+
+private fun stopPedestrianService(context: Context){
+    Intent(context, PedestrianService::class.java).apply {
+        action = PedestrianService.ACTION_STOP
+        context.stopService(this)
+    }
+}
+

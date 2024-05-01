@@ -51,7 +51,6 @@ fun HomeScreen(activity: ComponentActivity, userMode : Boolean){
                             },
                         )
                         geofenceManager.registerGeofence()
-                        retrofitManager.postUserMode()
                         retrofitManager.postAPInfo(APInfoDTO("newAP", 37.4221, -122.0852)) // Modify Required
                     }
                     if(!LocationService.isRunning()){

@@ -1,7 +1,5 @@
 package com.example.smombierecognitionalarmapplication.ui.screens
 
-import android.content.Context
-import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -9,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateMapOf
@@ -19,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
-import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -29,7 +25,9 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @Composable
@@ -59,7 +57,7 @@ fun MapScreen(activity: ComponentActivity) {
     }
 
     LaunchedEffect(smombiesLocation) {
-        val tasks =
+        withContext(Dispatchers.Default) {
             listOf(
                 smombiesLocation?.riskLevel1 to 1,
                 smombiesLocation?.riskLevel2 to 2,
@@ -68,11 +66,13 @@ fun MapScreen(activity: ComponentActivity) {
                 riskLevelInfos?.let { infos ->
                     launch {
                         infos.forEach { info ->
-                            smombieMarkers[info.deviceId] = Pair(LatLng(info.latitude, info.longitude), riskLevel)
+                            smombieMarkers[info.deviceId] =
+                                Pair(LatLng(info.latitude, info.longitude), riskLevel)
                         }
                     }
                 }
             }
+        }
     }
 
     GoogleMap(
@@ -99,13 +99,6 @@ fun MapScreen(activity: ComponentActivity) {
     }
 
     AlarmDisplay()
-
-    DisposableEffect(Unit) {
-        onDispose {
-            stopLocationService(activity.applicationContext)
-            stopVehicleService(activity.applicationContext)
-        }
-    }
 }
 
 @Composable
@@ -152,19 +145,5 @@ private fun AlarmDisplay(){
             tint = Color.Yellow,
             modifier = Modifier.size(200.dp)
         )
-    }
-}
-
-private fun stopLocationService(context : Context){
-    Intent(context, LocationService::class.java).apply {
-        action = LocationService.ACTION_STOP
-        context.startForegroundService(this)
-    }
-}
-
-private fun stopVehicleService(context: Context){
-    Intent(context, VehicleService::class.java).apply {
-        action = VehicleService.ACTION_STOP
-        context.startForegroundService(this)
     }
 }
