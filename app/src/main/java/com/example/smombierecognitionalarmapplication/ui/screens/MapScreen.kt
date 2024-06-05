@@ -1,5 +1,6 @@
 package com.example.smombierecognitionalarmapplication.ui.screens
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -8,12 +9,10 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -25,56 +24,50 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun MapScreen(activity: ComponentActivity) {
-    val APPosition = LatLng(37.4221, -122.0852) //Modify Required
+    val APPosition = LatLng(37.4221, -122.0852) // Modify Required
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(APPosition, 15f)
     }
 
-    val currentLocation= LocationService.locationUpdate.collectAsState(initial = null).value
-    val smombiesLocation = RetrofitManager.smombieUpdate.collectAsState(initial = null).value
-    val currentLocationMarkerState = rememberMarkerState(position = APPosition)
-    val smombieMarkers = remember { mutableStateMapOf<String, Pair<LatLng, Int>>() }
-
-    LaunchedEffect(currentLocation) {
-        currentLocation?.let {
-            currentLocationMarkerState.position = LatLng(it.latitude, it.longitude)
-            cameraPositionState.move(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        it.latitude,
-                        it.longitude
-                    ), 17f
-                )
-            )
-        }
-    }
-
-    LaunchedEffect(smombiesLocation) {
-        withContext(Dispatchers.Default) {
+    val currentLocation = LocationService.locationUpdate
+        .map { it?.let { LatLng(it.latitude, it.longitude) } }
+        .collectAsStateWithLifecycle(initialValue = null).value
+    val smombiesLocation = RetrofitManager.smombieUpdate
+        .map { smombiesLocation ->
+            val smombieMarkers = mutableMapOf<String, Pair<LatLng, Int>>()
             listOf(
                 smombiesLocation?.riskLevel1 to 1,
                 smombiesLocation?.riskLevel2 to 2,
                 smombiesLocation?.riskLevel3 to 3
             ).forEach { (riskLevelInfos, riskLevel) ->
-                riskLevelInfos?.let { infos ->
-                    launch {
-                        infos.forEach { info ->
-                            smombieMarkers[info.deviceId] =
-                                Pair(LatLng(info.latitude, info.longitude), riskLevel)
-                        }
-                    }
+                riskLevelInfos?.forEach { info ->
+                    smombieMarkers[info.deviceId] =
+                        Pair(LatLng(info.latitude, info.longitude), riskLevel)
+                    Log.d("DeviceID : ${info.deviceId}", "Location : ${info.latitude}, ${info.longitude}, $riskLevel")
                 }
             }
+            smombieMarkers
+        }
+        .collectAsStateWithLifecycle(initialValue = emptyMap()).value
+    //여러 스몸비의 위치가 동시에 포착 되지 못함... 
+
+    val currentLocationMarkerState = rememberMarkerState(position = APPosition)
+
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let {
+            currentLocationMarkerState.position = it
+            cameraPositionState.move(
+                CameraUpdateFactory.newLatLngZoom(it, 14f)
+            )
         }
     }
+    LaunchedEffect(smombiesLocation) {
 
+    }
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState
@@ -88,7 +81,7 @@ fun MapScreen(activity: ComponentActivity) {
             state = currentLocationMarkerState,
             title = "Current Location"
         )
-        smombieMarkers.forEach { (deviceId, pair) ->
+        smombiesLocation.forEach { (deviceId, pair) ->
             SmombieMarker(
                 position = pair.first,
                 title = "스몸비 $deviceId",
@@ -108,10 +101,14 @@ private fun SmombieMarker(
     snippet: String,
     risk: Int
 ) {
-    val hue = risk.toFloat()*10+200
-    val icon = BitmapDescriptorFactory.defaultMarker(hue)
+    val icon = when (risk) {
+        1 -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+        2 -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)
+        3 -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
+        else -> return
+    }
     Marker(
-        state = MarkerState(position=position),
+        state = MarkerState(position = position),
         title = title,
         snippet = snippet,
         icon = icon,
@@ -125,9 +122,9 @@ private fun APMarker(
     snippet: String,
 ) {
     val hue = 50f
-    val icon = BitmapDescriptorFactory.defaultMarker(hue)
+    val icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
     Marker(
-        state = MarkerState(position=position),
+        state = MarkerState(position = position),
         title = title,
         snippet = snippet,
         icon = icon,
@@ -135,10 +132,10 @@ private fun APMarker(
 }
 
 @Composable
-private fun AlarmDisplay(){
-    val alarm = RetrofitManager.alarm.collectAsState(initial = false).value
+private fun AlarmDisplay() {
+    val alarm = RetrofitManager.alarm.collectAsStateWithLifecycle(initialValue = false).value
 
-    if(alarm){
+    if (alarm) {
         Icon(
             imageVector = Icons.Filled.Warning,
             contentDescription = "경고",
