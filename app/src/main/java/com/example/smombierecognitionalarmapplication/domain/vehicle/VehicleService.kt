@@ -88,16 +88,16 @@ class VehicleService : Service(){
             .setOngoing(true)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val retrofitManager = RetrofitManager()
+
         notificationManager.getNotificationChannel(LOCATION_NOTIFICATION_CHANNEL_ID)
         val apName = "newAP" // Modify Required
         serviceScope.launch{
             LocationService.locationUpdate.collect{ location ->
                 val userDataDTO = UserDataDTO(location, false, false, apName)
-                retrofitManager.patchUserData(userDataDTO)
+                RetrofitManager.patchUserData(userDataDTO)
 
                 val alert = try {
-                    retrofitManager.getSmombieData()
+                    RetrofitManager.getSmombieData()
                 } catch (e: Exception) {
                     e.printStackTrace()
                     false

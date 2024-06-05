@@ -78,16 +78,16 @@ class PedestrianService : Service() {
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setContentIntent(gotoMain)
             .setOngoing(true)
-        val retrofitManager = RetrofitManager()
+
         val apName = "newAP" // Modify Required
         serviceScope.launch {
             LocationService.locationUpdate.collect{ location ->
                 if(ScreenStateReceiver.isScreenOn() and checkMemoryUsageHigh(applicationContext)){
                     val userDataDTO = UserDataDTO(location, true, true, apName)
-                    retrofitManager.patchUserData(userDataDTO)
+                    RetrofitManager.patchUserData(userDataDTO)
                 } else {
                     val userDataDTO = UserDataDTO(location, true, false, apName)
-                    retrofitManager.patchUserData(userDataDTO)
+                    RetrofitManager.patchUserData(userDataDTO)
                 }
             }
         }

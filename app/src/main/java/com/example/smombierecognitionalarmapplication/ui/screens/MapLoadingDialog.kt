@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
+import com.google.android.gms.maps.MapsInitializer
 import kotlinx.coroutines.delay
 
 @Composable
@@ -28,6 +29,7 @@ fun MapLoadingDialog(activity: ComponentActivity, navController: NavController){
         if(!VehicleService.isRunning()){
             startVehicleService(activity.applicationContext)
         }
+        MapsInitializer.initialize(activity, MapsInitializer.Renderer.LATEST, null)
         // Modify Required
         delay(2000)
         navController.navigate("map")

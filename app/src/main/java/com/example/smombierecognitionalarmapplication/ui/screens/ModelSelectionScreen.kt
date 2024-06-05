@@ -104,7 +104,6 @@ fun ModeSelectionScreen(navController: NavController, activity: ComponentActivit
 @Composable
 fun NavigationButtons(navController: NavController, activity: ComponentActivity) {
     val prefUtil = PreferenceUtils(activity.applicationContext)
-    val retrofitManager = RetrofitManager()
     prefUtil.createUuid()
     Column(
         modifier = Modifier
@@ -116,7 +115,7 @@ fun NavigationButtons(navController: NavController, activity: ComponentActivity)
         Button(
             onClick = {
                 prefUtil.setUserMode(true)
-                retrofitManager.postUserMode()
+                RetrofitManager.postUserMode()
                 navController.navigate("pedestrian")
             },
             modifier = Modifier.height(200.dp)
@@ -127,7 +126,7 @@ fun NavigationButtons(navController: NavController, activity: ComponentActivity)
         Button(
             onClick = {
                 prefUtil.setUserMode(false)
-                retrofitManager.postUserMode()
+                RetrofitManager.postUserMode()
                 navController.navigate("vehicle")
             },
             modifier = Modifier.height(200.dp)
