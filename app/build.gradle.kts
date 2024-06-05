@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    "com.google.gms.google-services"
 }
 
 android {
@@ -50,6 +51,10 @@ android {
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose")
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
     implementation(libs.retrofit)

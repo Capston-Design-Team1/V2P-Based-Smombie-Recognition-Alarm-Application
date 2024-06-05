@@ -1,6 +1,7 @@
 package com.example.smombierecognitionalarmapplication.data.api
 
 import com.example.smombierecognitionalarmapplication.data.api.models.APInfoDTO
+import com.example.smombierecognitionalarmapplication.data.api.models.FcmTokenDTO
 import com.example.smombierecognitionalarmapplication.data.api.models.SmombiesDTO
 import com.example.smombierecognitionalarmapplication.data.api.models.UserDataDTO
 import com.example.smombierecognitionalarmapplication.data.api.models.UserModeDTO
@@ -23,4 +24,6 @@ interface APIService {
         @Path("deviceId") deviceId: String,
         @Body userData : UserDataDTO
     ) : Call<Void>
+    @POST("fcm/token")
+    fun postUserToken(@Body fcmTokenDTO : FcmTokenDTO) : Call<Void>
 }

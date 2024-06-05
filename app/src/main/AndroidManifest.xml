@@ -46,7 +46,13 @@
         <service android:name=".domain.location.LocationService" android:foregroundServiceType="location"/>
         <service android:name=".domain.pedestrian.PedestrianService" android:foregroundServiceType="dataSync"/>
         <service android:name=".domain.vehicle.VehicleService" android:foregroundServiceType="dataSync"/>
-
+        <service
+            android:name=".data.api.FCMService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
         <activity
             android:name=".MainActivity"
             android:exported="true"

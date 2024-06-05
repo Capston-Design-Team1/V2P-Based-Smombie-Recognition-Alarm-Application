@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.util.Log
+import com.google.firebase.messaging.FirebaseMessaging
 import java.util.UUID
 
 class PreferenceUtils(context: Context) {
@@ -25,7 +26,11 @@ class PreferenceUtils(context: Context) {
         "USER_MODE", MODE_PRIVATE
     )
 
-    fun getString(key: String, defVal: String): String {
+    private val prefToken: SharedPreferences = context.getSharedPreferences(
+        "USER_TOKEN", MODE_PRIVATE
+    )
+
+    private fun getString(key: String, defVal: String): String {
         return prefUUID.getString(key, defVal).toString()
     }
 
@@ -49,15 +54,41 @@ class PreferenceUtils(context: Context) {
     /*
    USER MODE
        true : Pedestrian, false : Vehicle
-   Modify Required
     */
     fun setUserMode(mode: Boolean){
         USER_MODE = mode
         prefMode.edit().putBoolean("USERMOD", mode).apply()
     }
 
+    fun getUserMode() : Boolean {
+        return prefMode.getBoolean("USERMOD", false)
+    }
 
-//    fun getUserMode() : Boolean {
-//        return prefMode.getBoolean("USERMOD", false)
-//    }
+    fun setUserToken(token: String) {
+        setToken("FCMToken", token)
+    }
+
+    fun getUserToken() : String {
+        var token = getToken("FCMToken", "")
+        if(token == ""){
+            FirebaseMessaging.getInstance().token.addOnCompleteListener{
+                task ->
+                if(task.isSuccessful){
+                    val newToken = task.result
+                    setToken("FCMToken", newToken)
+                } else {
+                    Log.d("Firebase", "Failed to get token")
+                }
+            }
+        }
+        return token
+    }
+
+    private fun getToken(key: String, defVal: String): String {
+        return prefToken.getString(key, defVal).toString()
+    }
+
+    private fun setToken(key: String, token: String) {
+        prefToken.edit().putString(key, token).apply()
+    }
 }

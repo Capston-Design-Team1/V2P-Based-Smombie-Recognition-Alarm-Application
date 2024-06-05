@@ -18,8 +18,8 @@ const val SMOMBIEALERT_NOTIFICATION_ID = 2
 const val SMOMBIEALERT_NOTIFICATION_CHANNEL_ID = "smombieAlert"
 
 //현재 컴퓨터의 IP 주소
-const val APIBASE_URL = "http://192.168.0.14:8080/"
-
+//const val APIBASE_URL = "http://192.168.0.14:8080/"
+const val APIBASE_URL = "http://172.20.27.30:8080/"
 const val SMOMBIE_TRIGGER_EXPIRATION_TIME = 300000L //5분
 
 const val LOCATION_UPDATE_INTERVAL = 2000L
