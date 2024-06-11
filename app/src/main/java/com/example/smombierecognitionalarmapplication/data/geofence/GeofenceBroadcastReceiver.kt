@@ -38,17 +38,18 @@ class GeofenceBroadcastReceiver : BroadcastReceiver(){
         if(geofencingEvent.geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL){
             when(PreferenceUtils.getUserMode()){
                 //pedestrian
-                true -> {
+                false -> {
                     stopVehicleService(context)
                     if (!PedestrianService.isRunning()) {
-//                        startPedestrianService(context)
+                        startPedestrianService(context)
                         CoroutineScope(Dispatchers.IO).launch{
                             UserActivityTransitionManager(context).registerActivityTransitions()
                         }
                     }
+                    Log.d("pedestrian", "false")
                 }
                 //vehicle
-                false -> {
+                true -> {
                     stopPedestrianService(context)
                     if (!VehicleService.isRunning()) {
                         startVehicleService(context)

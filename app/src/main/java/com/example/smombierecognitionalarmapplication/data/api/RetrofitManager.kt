@@ -22,6 +22,8 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.awaitResponse
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
+import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
 
 object RetrofitManager {
@@ -41,6 +43,7 @@ object RetrofitManager {
     val alarm = _alarm.asSharedFlow()
     private val triggeredSmombieIdMap: ConcurrentHashMap<String, Long> = ConcurrentHashMap()
     private val handler = Handler(Looper.getMainLooper())
+    var connection = true;
 
     suspend fun getSmombieData(): Boolean {
         var alert = false
@@ -49,7 +52,7 @@ object RetrofitManager {
         call.awaitResponse().runCatching {
             if (HTTPResponseCheck(code())) {
                 val response = body() ?: return false
-                Log.d("SmombieResponse", "OK ${response.riskLevel1.firstOrNull()} , ${response.riskLevel2.firstOrNull()}, ${response.riskLevel3.firstOrNull()}")
+                Log.d("SmombieResponse", "${response.riskLevel1.firstOrNull()} , ${response.riskLevel2.firstOrNull()}, ${response.riskLevel3.firstOrNull()}")
                 _smombieUpdate.emit(response)
                 response.riskLevel1?.forEach { smombieInfo ->
                     withContext(Dispatchers.Default) {
@@ -71,20 +74,26 @@ object RetrofitManager {
             }
         }.onFailure { exception ->
             exception.printStackTrace()
+            if(exception is IOException || exception is SocketTimeoutException){
+                connection = false
+            }
         }
         return false
     }
 
-    fun postUserMode() {
+    fun postUser() {
         val call = apiService.postUserCreation(UserModeDTO(PreferenceUtils.getDeviceID(), PreferenceUtils.getUserMode()))
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                Log.d("Server Response", response.code().toString())
+                Log.d("Server Response postUserMode", response.code().toString())
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.d("Server Response", "Fail")
+                Log.d("Server Response", "Fail postUserMode")
                 t.printStackTrace()
+                if(t is SocketTimeoutException){
+                    connection = false
+                }
             }
         })
     }
@@ -93,12 +102,14 @@ object RetrofitManager {
         val call = apiService.postAPInfo(apInfoDTO)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                Log.d("Server Response", response.code().toString())
+                Log.d("Server Response postAPInfo", response.code().toString())
             }
-
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.d("Server Response", "Fail")
+                Log.d("Server Response", "Fail postAPInfo")
                 t.printStackTrace()
+                if(t is SocketTimeoutException){
+                    connection = false
+                }
             }
         })
     }
@@ -107,12 +118,15 @@ object RetrofitManager {
         val call = apiService.patchUserData(PreferenceUtils.getDeviceID(), userdatadto)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                Log.d("Server Response", response.code().toString())
+                Log.d("Server Response patchUserData", response.code().toString())
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.d("Server Response", "Fail")
+                Log.d("Server Response", "Fail patchUserData")
                 t.printStackTrace()
+                if(t is SocketTimeoutException){
+                    connection = false
+                }
             }
         })
     }
@@ -121,12 +135,15 @@ object RetrofitManager {
         val call = apiService.postUserToken(fcmTokenDTO)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                Log.d("Server Response", response.code().toString())
+                Log.d("Server Response postUserToken", response.code().toString())
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                Log.d("Server Response", "Fail")
+                Log.d("Server Response", "Fail postUserToken")
                 t.printStackTrace()
+                if(t is SocketTimeoutException){
+                    connection = false
+                }
             }
         })
     }

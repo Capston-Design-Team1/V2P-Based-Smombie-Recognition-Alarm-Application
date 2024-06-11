@@ -2,6 +2,7 @@ package com.example.smombierecognitionalarmapplication.common.utils
 
 import android.app.ActivityManager
 import android.content.Context
+import com.example.smombierecognitionalarmapplication.data.MEMEORY_THRESHOLD
 
 fun checkSystemMemoryUsage(context: Context): String {
     val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -28,7 +29,6 @@ fun checkMemoryUsage(context: Context): String {
 }
 
 fun checkMemoryUsageHigh(context: Context): Boolean {
-    val MEMEORY_THRESHOLD = 30
     val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     val memoryInfo = ActivityManager.MemoryInfo()
     activityManager.getMemoryInfo(memoryInfo)

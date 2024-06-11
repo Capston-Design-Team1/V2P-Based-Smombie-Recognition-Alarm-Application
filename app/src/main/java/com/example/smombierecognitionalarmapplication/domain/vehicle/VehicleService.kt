@@ -16,6 +16,7 @@ import com.example.smombierecognitionalarmapplication.data.SMOMBIEALERT_NOTIFICA
 import com.example.smombierecognitionalarmapplication.data.SMOMBIEALERT_NOTIFICATION_ID
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.data.api.models.UserDataDTO
+import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -93,7 +94,7 @@ class VehicleService : Service(){
         val apName = "newAP" // Modify Required
         serviceScope.launch{
             LocationService.locationUpdate.collect{ location ->
-                val userDataDTO = UserDataDTO(location, false, false, apName)
+                val userDataDTO = UserDataDTO(location, PreferenceUtils.getUserMode(), false, apName)
                 RetrofitManager.patchUserData(userDataDTO)
 
                 val alert = try {

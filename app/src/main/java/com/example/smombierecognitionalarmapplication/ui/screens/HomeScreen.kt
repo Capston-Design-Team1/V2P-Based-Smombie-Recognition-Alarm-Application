@@ -3,6 +3,7 @@ package com.example.smombierecognitionalarmapplication.ui.screens
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
@@ -21,9 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import com.example.smombierecognitionalarmapplication.common.utils.isInternetConnected
+import com.example.smombierecognitionalarmapplication.common.utils.showServerConnectionDialog
+import com.example.smombierecognitionalarmapplication.data.AP_LAT
+import com.example.smombierecognitionalarmapplication.data.AP_LONG
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.data.api.models.APInfoDTO
+import com.example.smombierecognitionalarmapplication.data.api.models.FcmTokenDTO
 import com.example.smombierecognitionalarmapplication.data.geofence.GeofenceManager
+import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
 import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
@@ -34,21 +40,33 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(activity: ComponentActivity, userMode : Boolean){
     val geofenceManager = GeofenceManager(activity.applicationContext)
+    val prefUtil = PreferenceUtils(activity.applicationContext)
 
     LaunchedEffect(Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            geofenceManager.addGeofence(
-                "mountain_view",
-                location = Location("").apply {
-                    latitude = 37.4221
-                    longitude = -122.0852
-                },
-            )
-            geofenceManager.registerGeofence()
-            RetrofitManager.postAPInfo(APInfoDTO("newAP", 37.4221, -122.0852)) // Modify Required
+        geofenceManager.addGeofence( // Modify Required
+            "mountain_view",
+            location = Location("").apply {
+                latitude = AP_LAT
+                longitude = AP_LONG
+            },
+        )
+        geofenceManager.registerGeofence()
+        RetrofitManager.postAPInfo(APInfoDTO("newAP", AP_LAT, AP_LONG)) // Modify Required
+
+        // For resetting server
+        prefUtil.getUserToken { token ->
+            if (token.isNotEmpty()) {
+                RetrofitManager.postUserToken(FcmTokenDTO(PreferenceUtils.getDeviceID(), token))
+            } else {
+                Log.e("UserToken", "Failed to retrieve FCM Token")
+            }
         }
     }
 
+    /*
+    USER MODE
+       false : Pedestrian, true : Vehicle
+    */
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,7 +83,7 @@ fun HomeScreen(activity: ComponentActivity, userMode : Boolean){
                     sendAppToBackground(activity)
                 } else {
                     Toast.makeText(
-                        activity.baseContext,
+                        activity,
                         "인터넷 연결을 확인해 주세요",
                         Toast.LENGTH_SHORT,
                     ).show()
@@ -91,6 +109,10 @@ fun HomeScreen(activity: ComponentActivity, userMode : Boolean){
         ) {
             Text("종료", style = MaterialTheme.typography.headlineSmall)
         }
+    }
+
+    if(!RetrofitManager.connection) {
+        showServerConnectionDialog(activity)
     }
 }
 

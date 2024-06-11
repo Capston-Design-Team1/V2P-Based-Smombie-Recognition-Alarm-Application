@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    "com.google.gms.google-services"
+    id("com.google.gms.google-services") apply true
 }
 
 android {

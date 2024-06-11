@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.example.smombierecognitionalarmapplication.common.utils.isInternetConnected
+import com.example.smombierecognitionalarmapplication.common.utils.showServerConnectionDialog
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
@@ -93,18 +96,54 @@ fun ModeSelectionScreen(navController: NavController, activity: ComponentActivit
         )
     }
 
-    if (permissionsGranted) { //Modify Required - 인터넷 연결 X or Server Request/Response 오류 시 Toast, Dialog 또는 Modal 창
+    if (permissionsGranted) {
         stopLocationService(activity.applicationContext)
         stopVehicleService(activity.applicationContext)
         stopPedestrianService(activity.applicationContext)
         NavigationButtons(navController, activity)
+
+        if(!isInternetConnected(activity.applicationContext)){
+            AlertDialog(
+                onDismissRequest = { ActivityCompat.finishAffinity(activity) },
+                title = { Text("인터넷 연결을 확인해 주세요") },
+                text = { Text("Wi-Fi 또는 모바일 데이터 연결 상태를 " +
+                        "확인해 주세요.\n\n" +
+                        "네트워크 설정에서 Wi-Fi를 켜거나 \n" +
+                        "모바일 데이터를 활성화해 주세요.") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            activity.startActivity(
+                                Intent(Settings.ACTION_WIFI_SETTINGS)
+                            )
+                        }
+                    ) {
+                        Text("인터넷 연결")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { ActivityCompat.finishAffinity(activity) }) {
+                        Text("나중에")
+                    }
+                }
+            )
+        }
+
+        if(!RetrofitManager.connection) {
+            showServerConnectionDialog(activity)
+        }
     }
 }
 
 @Composable
 fun NavigationButtons(navController: NavController, activity: ComponentActivity) {
     val prefUtil = PreferenceUtils(activity.applicationContext)
-    prefUtil.createUuid()
+
+    LaunchedEffect(Unit){
+        prefUtil.createUuid()
+        RetrofitManager.postUser()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -114,8 +153,7 @@ fun NavigationButtons(navController: NavController, activity: ComponentActivity)
     ) {
         Button(
             onClick = {
-                prefUtil.setUserMode(true)
-                RetrofitManager.postUserMode()
+                prefUtil.setUserMode(false)
                 navController.navigate("pedestrian")
             },
             modifier = Modifier.height(200.dp)
@@ -125,8 +163,7 @@ fun NavigationButtons(navController: NavController, activity: ComponentActivity)
         Spacer(modifier = Modifier.height(60.dp))
         Button(
             onClick = {
-                prefUtil.setUserMode(false)
-                RetrofitManager.postUserMode()
+                prefUtil.setUserMode(true)
                 navController.navigate("vehicle")
             },
             modifier = Modifier.height(200.dp)

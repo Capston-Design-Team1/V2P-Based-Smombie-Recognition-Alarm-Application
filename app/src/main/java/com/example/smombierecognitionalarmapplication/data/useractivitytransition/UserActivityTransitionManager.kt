@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.annotation.RequiresPermission
 import com.example.smombierecognitionalarmapplication.data.CUSTOM_REQUEST_CODE_USER_ACTION
 import com.google.android.gms.location.ActivityRecognition
@@ -20,7 +21,6 @@ class UserActivityTransitionManager(context: Context) {
                 DetectedActivity.STILL -> "STILL"
                 DetectedActivity.WALKING -> "WALKING"
                 DetectedActivity.RUNNING -> "RUNNING"
-                DetectedActivity.TILTING -> "TILTING"
                 DetectedActivity.ON_FOOT -> "ON_FOOT"
                 else -> "UNKNOWN"
             }
@@ -48,8 +48,6 @@ class UserActivityTransitionManager(context: Context) {
             getUserActivity(DetectedActivity.WALKING, ActivityTransition.ACTIVITY_TRANSITION_EXIT),
             getUserActivity(DetectedActivity.RUNNING, ActivityTransition.ACTIVITY_TRANSITION_ENTER),
             getUserActivity(DetectedActivity.RUNNING, ActivityTransition.ACTIVITY_TRANSITION_EXIT),
-            getUserActivity(DetectedActivity.TILTING, ActivityTransition.ACTIVITY_TRANSITION_ENTER),
-            getUserActivity(DetectedActivity.TILTING, ActivityTransition.ACTIVITY_TRANSITION_EXIT),
             getUserActivity(DetectedActivity.ON_FOOT, ActivityTransition.ACTIVITY_TRANSITION_ENTER),
             getUserActivity(DetectedActivity.ON_FOOT, ActivityTransition.ACTIVITY_TRANSITION_EXIT)
         )
@@ -62,7 +60,7 @@ class UserActivityTransitionManager(context: Context) {
             context,
             CUSTOM_REQUEST_CODE_USER_ACTION,
             Intent(context, UserActivityTransitionBroadcastReceiver::class.java),
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
     }
 
@@ -77,11 +75,16 @@ class UserActivityTransitionManager(context: Context) {
     @RequiresPermission(ACTIVITY_RECOGNITION)
     suspend fun registerActivityTransitions() = kotlin.runCatching {
         if (!isUserActivityTransitionRegistered) {
-            activityClient.requestActivityTransitionUpdates(
-                ActivityTransitionRequest(activityTransitions),
-                pendingIntent
-            ).await()
-            isUserActivityTransitionRegistered = true
+            try {
+                activityClient.requestActivityTransitionUpdates(
+                    ActivityTransitionRequest(activityTransitions),
+                    pendingIntent
+                ).await()
+                isUserActivityTransitionRegistered = true
+                Log.d("UserActivityTransition", "success")
+            } catch (e: Exception) {
+                Log.d("UserActivityTransition", "fail", e)
+            }
         }
     }
 

@@ -1,6 +1,6 @@
 package com.example.smombierecognitionalarmapplication.common.utils
 
-suspend fun HTTPResponseCheck(code : Int) : Boolean{
+fun HTTPResponseCheck(code : Int) : Boolean{
     when(code){
         in 200..299 -> return true
         in 300..399 -> throw Exception("Redirection")

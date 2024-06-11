@@ -15,6 +15,7 @@ import com.example.smombierecognitionalarmapplication.data.LOCATION_DB_NOTIFICAT
 import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION_CHANNEL_ID
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.data.api.models.UserDataDTO
+import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -83,10 +84,10 @@ class PedestrianService : Service() {
         serviceScope.launch {
             LocationService.locationUpdate.collect{ location ->
                 if(ScreenStateReceiver.isScreenOn() and checkMemoryUsageHigh(applicationContext)){
-                    val userDataDTO = UserDataDTO(location, true, true, apName)
+                    val userDataDTO = UserDataDTO(location, PreferenceUtils.getUserMode(), true, apName)
                     RetrofitManager.patchUserData(userDataDTO)
                 } else {
-                    val userDataDTO = UserDataDTO(location, true, false, apName)
+                    val userDataDTO = UserDataDTO(location, PreferenceUtils.getUserMode(), false, apName)
                     RetrofitManager.patchUserData(userDataDTO)
                 }
             }

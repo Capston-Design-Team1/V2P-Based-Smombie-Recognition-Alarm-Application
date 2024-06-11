@@ -53,35 +53,37 @@ class PreferenceUtils(context: Context) {
 
     /*
    USER MODE
-       true : Pedestrian, false : Vehicle
+       false : Pedestrian, true : Vehicle
     */
     fun setUserMode(mode: Boolean){
         USER_MODE = mode
         prefMode.edit().putBoolean("USERMOD", mode).apply()
     }
 
-    fun getUserMode() : Boolean {
-        return prefMode.getBoolean("USERMOD", false)
-    }
+//    fun getUserMode() : Boolean {
+//        return prefMode.getBoolean("USERMOD", false)
+//    }
 
     fun setUserToken(token: String) {
         setToken("FCMToken", token)
     }
 
-    fun getUserToken() : String {
+    fun getUserToken(callback: (String) -> Unit) {
         var token = getToken("FCMToken", "")
-        if(token == ""){
-            FirebaseMessaging.getInstance().token.addOnCompleteListener{
-                task ->
-                if(task.isSuccessful){
+        if (token == "") {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     val newToken = task.result
                     setToken("FCMToken", newToken)
+                    callback(newToken)
                 } else {
                     Log.d("Firebase", "Failed to get token")
+                    callback(token)
                 }
             }
+        } else {
+            callback(token)
         }
-        return token
     }
 
     private fun getToken(key: String, defVal: String): String {

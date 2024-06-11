@@ -30,8 +30,7 @@ fun MapLoadingDialog(activity: ComponentActivity, navController: NavController){
             startVehicleService(activity.applicationContext)
         }
         MapsInitializer.initialize(activity, MapsInitializer.Renderer.LATEST, null)
-        // Modify Required
-        delay(2000)
+        delay(1500)
         navController.navigate("map")
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){

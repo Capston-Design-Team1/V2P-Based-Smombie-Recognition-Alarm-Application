@@ -13,6 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.smombierecognitionalarmapplication.R
+import com.example.smombierecognitionalarmapplication.common.utils.showServerConnectionDialog
+import com.example.smombierecognitionalarmapplication.data.AP_LAT
+import com.example.smombierecognitionalarmapplication.data.AP_LONG
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -28,9 +32,9 @@ import kotlinx.coroutines.flow.map
 
 @Composable
 fun MapScreen(activity: ComponentActivity) {
-    val APPosition = LatLng(37.4221, -122.0852) // Modify Required
+    val APPosition = LatLng(AP_LAT, AP_LONG) // Modify Required
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(APPosition, 15f)
+        position = CameraPosition.fromLatLngZoom(APPosition, 16f)
     }
 
     val currentLocation = LocationService.locationUpdate
@@ -53,7 +57,6 @@ fun MapScreen(activity: ComponentActivity) {
             smombieMarkers
         }
         .collectAsStateWithLifecycle(initialValue = emptyMap()).value
-    //여러 스몸비의 위치가 동시에 포착 되지 못함... 
 
     val currentLocationMarkerState = rememberMarkerState(position = APPosition)
 
@@ -61,13 +64,11 @@ fun MapScreen(activity: ComponentActivity) {
         currentLocation?.let {
             currentLocationMarkerState.position = it
             cameraPositionState.move(
-                CameraUpdateFactory.newLatLngZoom(it, 14f)
+                CameraUpdateFactory.newLatLngZoom(it, 16f)
             )
         }
     }
-    LaunchedEffect(smombiesLocation) {
 
-    }
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState
@@ -79,19 +80,24 @@ fun MapScreen(activity: ComponentActivity) {
         )
         Marker(
             state = currentLocationMarkerState,
-            title = "Current Location"
+            title = "Current Location",
+            icon = BitmapDescriptorFactory.fromResource(R.drawable.car_icon3)
         )
         smombiesLocation.forEach { (deviceId, pair) ->
             SmombieMarker(
                 position = pair.first,
-                title = "스몸비 $deviceId",
-                snippet = "스몸비",
+                title = "스몸비 ${deviceId.hashCode()}",
+                snippet = "위험도 ${pair.second}",
                 risk = pair.second
             )
         }
     }
 
     AlarmDisplay()
+
+    if(!RetrofitManager.connection) {
+        showServerConnectionDialog(activity)
+    }
 }
 
 @Composable
@@ -111,7 +117,7 @@ private fun SmombieMarker(
         state = MarkerState(position = position),
         title = title,
         snippet = snippet,
-        icon = icon,
+        icon = icon
     )
 }
 
