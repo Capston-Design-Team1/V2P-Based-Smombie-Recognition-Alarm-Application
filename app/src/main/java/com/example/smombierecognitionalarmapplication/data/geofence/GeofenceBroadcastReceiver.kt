@@ -41,7 +41,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver(){
                 false -> {
                     stopVehicleService(context)
                     if (!PedestrianService.isRunning()) {
-                        startPedestrianService(context)
+                        // startPedestrianService(context)
                         CoroutineScope(Dispatchers.IO).launch{
                             UserActivityTransitionManager(context).registerActivityTransitions()
                         }

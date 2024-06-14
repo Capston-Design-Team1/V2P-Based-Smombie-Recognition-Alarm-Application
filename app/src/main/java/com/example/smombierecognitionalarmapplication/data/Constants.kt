@@ -21,10 +21,10 @@ const val DANGERALERT_NOTIFICATION_ID = 3
 const val DANGERALERT_NOTIFICATION_CHANNEL_ID = "smombieDanger"
 
 //현재 컴퓨터의 IP 주소
-const val APIBASE_URL = "http://192.168.1.102:8080/"
+// const val APIBASE_URL = "http://192.168.1.102:8080/"
 
 // AWS EC2 서버 배포 주소
-// const val APIBASE_URL = "http://52.78.33.176:8080/"
+const val APIBASE_URL = "http://52.78.33.176:8080/"
 
 const val SMOMBIE_TRIGGER_EXPIRATION_TIME = 300000L //5분
 const val CONFIRM_EXPIRATION_TIME = 60000L //1분
