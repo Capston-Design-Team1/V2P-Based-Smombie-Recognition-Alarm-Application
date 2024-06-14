@@ -16,6 +16,7 @@ import com.example.smombierecognitionalarmapplication.data.LOCATION_NOTIFICATION
 import com.example.smombierecognitionalarmapplication.data.api.RetrofitManager
 import com.example.smombierecognitionalarmapplication.data.api.models.UserDataDTO
 import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
+import com.example.smombierecognitionalarmapplication.data.notification.NotificationConfirmReceiver
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,8 +75,8 @@ class PedestrianService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
         val notification = NotificationCompat.Builder(this, LOCATION_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Pedestrian Service")
-            .setContentText("Running...")
+            .setContentTitle("보행자 모드")
+            .setContentText("실행 중...")
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setContentIntent(gotoMain)
             .setOngoing(true)
@@ -83,7 +84,7 @@ class PedestrianService : Service() {
         val apName = "newAP" // Modify Required
         serviceScope.launch {
             LocationService.locationUpdate.collect{ location ->
-                if(ScreenStateReceiver.isScreenOn() and checkMemoryUsageHigh(applicationContext)){
+                if(ScreenStateReceiver.isScreenOn() and checkMemoryUsageHigh(applicationContext) and !NotificationConfirmReceiver.checkNotificationConfirmRecently()){
                     val userDataDTO = UserDataDTO(location, PreferenceUtils.getUserMode(), true, apName)
                     RetrofitManager.patchUserData(userDataDTO)
                 } else {

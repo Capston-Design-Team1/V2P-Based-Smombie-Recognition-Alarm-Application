@@ -42,6 +42,7 @@
                 <action android:name="android.intent.action.SCREEN_OFF" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".data.notification.NotificationConfirmReceiver" android:exported="false" />
 
         <service android:name=".domain.location.LocationService" android:foregroundServiceType="location"/>
         <service android:name=".domain.pedestrian.PedestrianService" android:foregroundServiceType="dataSync"/>

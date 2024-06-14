@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 
 class GeofenceManager(context: Context) {
     companion object {
-        const val RADIUS_METERS : Float = 500.0f // Default 100m
+        const val RADIUS_METERS : Float = 200.0f // Default 100m
         const val DWELLING_DELAY_MILLIS : Int = 5000 // 5sec
     }
     private val geofencingClient = LocationServices.getGeofencingClient(context)

@@ -84,8 +84,8 @@ class LocationService : Service(){
         )
 
         val notification = NotificationCompat.Builder(this, LOCATION_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Location Service")
-            .setContentText("Running...")
+            .setContentTitle("위치 정보 서비스")
+            .setContentText("수집 중...")
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setContentIntent(gotoMain)
             .setOngoing(true)

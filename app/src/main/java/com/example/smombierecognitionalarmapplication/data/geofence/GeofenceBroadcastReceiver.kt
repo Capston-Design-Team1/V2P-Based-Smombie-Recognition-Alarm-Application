@@ -46,7 +46,6 @@ class GeofenceBroadcastReceiver : BroadcastReceiver(){
                             UserActivityTransitionManager(context).registerActivityTransitions()
                         }
                     }
-                    Log.d("pedestrian", "false")
                 }
                 //vehicle
                 true -> {

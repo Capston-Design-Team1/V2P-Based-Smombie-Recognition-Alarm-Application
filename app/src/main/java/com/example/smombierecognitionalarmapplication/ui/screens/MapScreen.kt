@@ -64,7 +64,7 @@ fun MapScreen(activity: ComponentActivity) {
         currentLocation?.let {
             currentLocationMarkerState.position = it
             cameraPositionState.move(
-                CameraUpdateFactory.newLatLngZoom(it, 16f)
+                CameraUpdateFactory.newLatLngZoom(it, 17f)
             )
         }
     }

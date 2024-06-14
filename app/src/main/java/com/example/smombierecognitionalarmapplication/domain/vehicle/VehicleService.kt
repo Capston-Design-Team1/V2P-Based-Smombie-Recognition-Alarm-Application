@@ -75,15 +75,16 @@ class VehicleService : Service(){
         )
 
         val alertNotification = NotificationCompat.Builder(this, SMOMBIEALERT_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Alert")
-            .setContentText("Running...")
+            .setContentTitle("스몸비 경고")
+            .setContentText("주의! 근처에 스몸비가 있습니다.")
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setContentIntent(gotoMain)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
         val locationNotification = NotificationCompat.Builder(this, LOCATION_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Vehicle Service")
-            .setContentText("Running...")
+            .setContentTitle("차량 모드")
+            .setContentText("작동 중...")
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setContentIntent(gotoMain)
             .setOngoing(true)
@@ -107,7 +108,8 @@ class VehicleService : Service(){
                 if (alert) {
                     withContext(Dispatchers.Main) {
                         val updatedNotification = alertNotification.setContentText(
-                            location.toString()
+                            "주의! 전방 50m안에 스몸비가 있습니다.\n" +
+                            "차량 운행에 주의 하세요"
                         )
                         notificationManager.notify(
                             SMOMBIEALERT_NOTIFICATION_ID,

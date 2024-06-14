@@ -37,6 +37,8 @@ import com.example.smombierecognitionalarmapplication.data.local.PreferenceUtils
 import com.example.smombierecognitionalarmapplication.domain.location.LocationService
 import com.example.smombierecognitionalarmapplication.domain.pedestrian.PedestrianService
 import com.example.smombierecognitionalarmapplication.domain.vehicle.VehicleService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun ModeSelectionScreen(navController: NavController, activity: ComponentActivity) {
@@ -141,7 +143,9 @@ fun NavigationButtons(navController: NavController, activity: ComponentActivity)
 
     LaunchedEffect(Unit){
         prefUtil.createUuid()
-        RetrofitManager.postUser()
+        launch(Dispatchers.IO){
+            RetrofitManager.postUser()
+        }
     }
 
     Column(

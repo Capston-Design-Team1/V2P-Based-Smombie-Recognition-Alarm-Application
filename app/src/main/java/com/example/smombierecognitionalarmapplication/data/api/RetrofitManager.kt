@@ -69,6 +69,8 @@ object RetrofitManager {
 
                 if (alert) {
                     _alarm.emit(alert)
+                } else {
+                    _alarm.emit(alert)
                 }
                 return alert
             }
